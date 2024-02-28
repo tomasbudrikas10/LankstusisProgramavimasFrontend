@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View, Alert, Pressable, TextInput, ImageBackground } from 'react-native';
-import React from 'react';
+import { Button, ScrollView, StyleSheet, Text, View, Pressable, ImageBackground, TouchableOpacity, Objects } from 'react-native';
+import React, {useState, useCallback} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Dropdown } from 'react-native-element-dropdown';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,30 +16,47 @@ function HomeScreen({ navigation }) {
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
-
         <View style={styles.titleBlock}>
-          <Text style={styles.title}>Sveiki!</Text>
+        <Text style={styles.title}>TAVO POREIKIAI - MŪSŲ PASIŪLYMAI</Text>
           <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
         </View>
-
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Form')} />
+          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Form')}/>
         </View>
-        <StatusBar style="auto" />
+        <StatusBar style="auto"/>
       </View>
     </ImageBackground>
   );
 }
 
 function AppForm({ navigation }) {
-  const [value, setValue] = React.useState(null);
-  const renderItem = item => {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.textItem}>{item.label}</Text>
-      </View>
-    );
-  };
+  const [isOpen1, setOpen1] = useState(false);
+  const [currentValue1, setCurrentValue1] = useState([]);
+  const onDropdown1Open = useCallback(() => {
+    setOpen2(false);
+  }, []);
+  const items1 = [
+    {label: 'Pirmas', value: 'a1'},
+    {label: 'Antras', value: 'a2'},
+    {label: 'Trečias', value: 'a3'},
+    {label: 'Ketvirtas', value: 'a4'},
+    {label: 'Penktas', value: 'a5'},
+    {label: 'Šeštas', value: 'a6'},
+    {label: 'Septintas', value: 'a7'},
+    {label: 'Aštuntas', value: 'a8'},
+    {label: 'Devintas', value: 'a9'},
+    {label: 'Dešimtas', value: 'a0'},
+  ];
+  const [isOpen2, setOpen2] = useState(false);
+  const [currentValue2, setCurrentValue2] = useState([]);
+  const onDropdown2Open = useCallback(() => {
+    setOpen1(false);
+  }, []);
+  const items2 = [
+    {label: 'Pirmas', value: 'b1'},
+    {label: 'Antras', value: 'b2'},
+    {label: 'Trečias', value: 'b3'},
+  ];
 
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
@@ -49,41 +66,90 @@ function AppForm({ navigation }) {
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
-
-        <Text style={styles.formTitle}>Klausimynas</Text>
-
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          data={data}
-          maxHeight={300}
-          labelField="label"
-          valueField=""
-          placeholder=""
-          value={value}
-          onChange={item => {
-            setValue(item.value);
-          }}
-          renderItem={renderItem}
-        />
-
-        <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#6699FF' onPress={() => navigation.navigate('List')} />
+        <View style={styles.formFlex}>
+          <Text style={styles.formTitle}>Klausimynas</Text>
+          <DropDownPicker
+            items={items1}
+            open={isOpen1}
+            setOpen={() => setOpen1(!isOpen1)}
+            value={currentValue1}
+            setValue={(val) => setCurrentValue1(val)}
+            placeholder='Kategorija: Pirma'
+            multiple={true}
+            min={0}
+            max={10}
+            maxHeight={200}
+            onOpen={onDropdown1Open}
+            showTickIcon={true}
+            theme='DARK'
+            mode='BADGE'
+            badgeColors={'black'}
+            badgeTextStyle={{color: 'white'}}
+            dropDownDirection="BOTTOM"
+            zIndex={200}
+            placeholderStyle={{fontWeight: 'bold'}}
+            style={styles.formCategory}
+          />
+          <DropDownPicker
+            items={items2}
+            open={isOpen2}
+            setOpen={() => setOpen2(!isOpen2)}
+            value={currentValue2}
+            setValue={(val) => setCurrentValue2(val)}
+            placeholder='Kategorija: Antra'
+            multiple={true}
+            min={0}
+            max={10}
+            maxHeight={200}
+            onOpen={onDropdown2Open}
+            showTickIcon={true}
+            theme='DARK'
+            mode='BADGE'
+            badgeColors={'black'}
+            badgeTextStyle={{color: 'white'}}
+            dropDownDirection="BOTTOM"
+            zIndex={100}
+            placeholderStyle={{fontWeight: 'bold'}}
+            style={styles.formCategory}
+          />
         </View>
-        <StatusBar style="auto" />
+        <View style={styles.buttonNext}>
+          <Button title='Tęsti' color='#6699FF' onPress={() => navigation.navigate('List', {category1: currentValue1, category2: currentValue2})}/>
+        </View>
+        <StatusBar style="auto"/>
       </View>
     </ImageBackground>
   );
 }
 
-const data = [
-  { label: '1 Kategorija', value: '1' },
-  { label: '2 Kategorija', value: '2' },
-  { label: '3 Kategorija', value: '3' },
-];
+function ItemList({route, navigation}) {
+  const {category1, category2} = route.params;
+  const myJSON1 = JSON.stringify(category1);
+  const getValue1 = JSON.parse(myJSON1);
+  const myJSON2 = JSON.stringify(category2);  
+  const getValue2 = JSON.parse(myJSON2);
+  let index = 0;
+  const results = [];
 
-function ItemList({navigation}) {
+  getValue1.forEach((category) => {
+    index = index+1;
+    results.push(
+      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Product', {itemId: category})}>
+        <Text style={styles.product}>{index}. Produktas</Text>
+        <Text style={styles.productAfter}>Kategorija: {category}</Text>
+      </TouchableOpacity>
+    )
+  })
+  getValue2.forEach((category) => {
+    index = index+1;
+    results.push(
+      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Product', {itemId: category})}>
+        <Text style={styles.product}>{index}. Produktas</Text>
+        <Text style={styles.productAfter}>Kategorija: {category}</Text>
+      </TouchableOpacity>
+    )
+  })
+
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
@@ -92,14 +158,13 @@ function ItemList({navigation}) {
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
+        <View style={styles.listFlex}>
+          <Text style={styles.listTitle}>Produktai:</Text>
+          <Text style={styles.listCategories}>Kategorijos: {getValue1}, {getValue2}</Text>
+          {results}
+        </View>
         
-        <Text style={styles.productsTitle}>Produktai:</Text>
-        <Pressable style={styles.productsItem} onPress={() => navigation.navigate('Product', {itemId: 1})}>
-          <Text title='Product1' style={styles.product}>Produktas 1</Text>
-        </Pressable>
-        <Pressable style={styles.productsItem} onPress={() => navigation.navigate('Product', {itemId: 2})}>
-          <Text title='Product2' style={styles.product}>Produktas 2</Text>
-        </Pressable>
+        
         <StatusBar style="auto" />
       </View>
     </ImageBackground>
@@ -107,7 +172,7 @@ function ItemList({navigation}) {
 }
 
 function ProductInfo({route, navigation}) {
-  const { itemId } = route.params;
+  const {itemId} = route.params;
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
@@ -116,40 +181,50 @@ function ProductInfo({route, navigation}) {
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
-        
         <View style={styles.productInfo}>
           <Text style={styles.productInfoTitle}>Produkto pavadinimas</Text>
           <Text style={styles.productInfoText}>Produkto informacija</Text>
           <Text style={styles.productInfoText}>itemId: {JSON.stringify(itemId)}</Text>
         </View>
-
-        <StatusBar style="auto" />
+        <StatusBar style="auto"/>
       </View>
     </ImageBackground>
   );
 }
 
-function HelpScreen() {
-  return (
-    <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
-      <View style={styles.container}>
-        <Text style={styles.helpTitle}>Pagalba</Text>
-        <Text style={styles.helpText}>Informacija, kaip reikia naudotis šia programa.</Text>
-        <Text style={styles.helpText}>1. Pasijunge programą jus sutinka pasveikinimo langas su galimybe eitį į klausimyno langą arba paspaudūs mėlyną mygtuką jus esate nukreipiamas į pagalbos langą.</Text>
-      </View>
-    </ImageBackground>
-  );
-}
+ function HelpScreen() {
+     return (
+       <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+         <View style={styles.container}>
+           <Text style={styles.helpTitle}>Kam reikalinga šį programa?</Text>
+           <Text style={styles.helpText}>Ši programa leidžia vartotojui surasti jam tinkamą išmaniūjų namų sistemą.....</Text>
+           <Text style={styles.helpTitle}>Kaip naudotis programa?</Text>
+           <Text style={styles.helpText}>1. Pradinio lango apačioje matomas mygtukas 'tęsti', kurį paspaudus jūs busite nuvedamas į klausimyną. </Text>
+           <Text style={styles.helpText}>2. Klausimyno lange jums reikia pasirinkti kūrią kategoriją norite pasirinkti.</Text>
+           <Text style={styles.helpText}>3. Pasirinkę kategoriją ir paspaudę mygtuką tęsti, jums bus rodoma produkto išsami informacija.</Text>
+           <Text style={styles.helpText}>4. Viršui kairėje paspaudūs mygtuką su atbuline rodykle, jūs būsite gražinamas į praeitą langą. </Text>
+           <Text style={styles.helpTitle}>Kas dare šią programą?</Text>
+           <Text style={styles.helpText}>Šia programą darė keturi Klaipėdos valstybinės kolegijos antro kurso informatikos studentai, kurie turėjo savo pareigas ir atsakomybes:</Text>
+           <Text style={styles.helpText}>Tomas Budrikas - Fullstack</Text>
+           <Text style={styles.helpText}>Meida Ivanauskaitė - Frontend</Text>
+           <Text style={styles.helpText}>Lukas Raišuotis - Backend</Text>
+          <Text style={styles.helpText}>Karolis Kleinauskas - Duomenų bazės</Text>
+         </View>
+         </ScrollView>
+       </ImageBackground>
+     );
+   }
 
 function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Form" component={AppForm} />
-        <Stack.Screen name="List" component={ItemList} />
-        <Stack.Screen name="Product" component={ProductInfo} />
-        <Stack.Screen name="Help" component={HelpScreen} />
+        <Stack.Screen name="Home" component={HomeScreen}/>
+        <Stack.Screen name="Form" component={AppForm}/>
+        <Stack.Screen name="List" component={ItemList}/>
+        <Stack.Screen name="Product" component={ProductInfo}/>
+        <Stack.Screen name="Help" component={HelpScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -184,22 +259,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 280,
     color: 'white',
-  },
-  dropdown: {
-    paddingHorizontal: 55,
-    height: 35,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-    top: -385
   },
   item: {
     padding: 15,
@@ -246,33 +305,55 @@ const styles = StyleSheet.create({
     width: 200, 
     height: 70,
   },
+  formFlex: {
+    flex: 1, 
+    width: '100%', 
+    position: 'absolute', 
+    alignItems: 'center', 
+    marginTop: 50
+  },
   formTitle: {
     fontSize: 40, 
     fontWeight: 'bold', 
-    marginBottom: 10, 
     color: 'white',
-    top: -410
+    marginBottom: 10
   },
-  productsTitle: {
+  formCategory: {
+    marginVertical: 5
+  },
+  listFlex: {
+    flex: 1, 
+    width: '100%', 
+    position: 'absolute', 
+    alignItems: 'center', 
+    marginTop: 50
+  },
+  listTitle: {
     fontSize: 40,
     fontWeight: 'bold',
     color: 'white',
-    top: -400
   },
-  productsItem: {
-    width: 300, 
-    marginBottom: 20, 
-    borderColor: '#6699FF', 
+  listCategories: {
+    color: 'white'
+  },
+  listItem: {
+    width: '100%', 
+    marginVertical: 5,
+    borderColor: '#313143', 
     borderWidth: 1, 
     borderStyle: 'solid', 
     borderRadius: 10, 
     padding: 8,
-    top: -375,
-    backgroundColor: '#6699FF'
+    backgroundColor: '#313143',
   },
   product: {
-    fontSize: 20,
-    color: 'white'
+    fontSize: 22,
+    color: '#E0E5F7',
+  },
+  productAfter: {
+    fontSize: 15,
+    color: '#CFD4E5',
+    marginLeft: 24
   },
   helpTitle: {
     fontSize: 35, 
@@ -307,4 +388,4 @@ const styles = StyleSheet.create({
 // cd .../LankstusisProgramavimasFrontend
 // npm install (node_modules)
 // npm run start (qr code)
-// npm run android (qr code + android programa pc).
+// npm run android (qr code + paleidimas per android pc)
