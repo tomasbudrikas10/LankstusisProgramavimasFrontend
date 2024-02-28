@@ -306,4 +306,4 @@ const styles = StyleSheet.create({
 // cd .../LankstusisProgramavimasFrontend
 // npm install (node_modules)
 // npm run start (qr code)
-// npm run android (qr code + android programa pc)
+// npm run android (qr code + android programa pc).
