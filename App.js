@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, ScrollView, StyleSheet, Text, View, Pressable, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -221,15 +221,26 @@ function HelpScreen({ navigation }) {
   );
 }
 
-function FeedbackScreen() {
-  const [rating, setRating] = useState(0); // Initialize rating state
-  const [feedbackText, setFeedbackText] = useState(''); // Initialize feedback text state
+function FeedbackScreen({ navigation }) {
+  const [rating, setRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [showModal, setShowModal] = useState(false); // State to manage modal visibility
 
   const handleSubmit = () => {
     // Handle submit logic, e.g., sending feedback to server
     console.log('Rating:', rating);
     console.log('Feedback Text:', feedbackText);
-    // You can implement your logic here to send feedback to the server or perform any other action
+
+    // Show the modal
+    setShowModal(true);
+  };
+
+  const handleContinue = () => {
+    // Hide the modal
+    setShowModal(false);
+
+    // Navigate to the Home screen
+    navigation.navigate('Home');
   };
 
   return (
@@ -265,6 +276,18 @@ function FeedbackScreen() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Siūsti</Text>
         </TouchableOpacity>
+
+        {/* Modal */}
+        {showModal && (
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Ačiū už atsiliepimą!</Text>
+              <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+                <Text style={styles.continueButtonText}>Tęsti</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
     </ImageBackground>
   );
@@ -293,7 +316,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginBottom: 50, // Adjust this value as needed to create the desired gap
+    marginBottom: 10, // Adjust this value as needed to create the desired gap
     paddingBottom: 20, // Additional padding to ensure content is not too close to the bottom
   },
   background: {
@@ -501,6 +524,31 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  continueButton: {
+    backgroundColor: '#6699FF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  continueButtonText: {
+    fontSize: 16,
+    color: '#fff',
   },
 });
 
