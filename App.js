@@ -113,32 +113,25 @@ function ItemList({navigation}) {
 getProducts()
 }, [])
 
-const [kategorijos, setKategorijos] = useState([])
+const [kategorijos1, setKategorijos] = useState([])
 useEffect(()=> {
   async function getCategories(){
   const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/categories/")
   const result = await response.json();
   setKategorijos(result)
   }
-} )
+}, [])
 
-const [kategorijosId, setKategorijosId]= useState([])
-useEffect (()=>{
-  async function getCategoriesId(){
-    const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/categories/(id)")
-    const result = await response.json();
-    setKategorijosId(result)
-  }
-})
 
-const[pasirinkimai, setPasirinkimai] = useState([])
+
+const [pasirinkimai1, setPasirinkimai] = useState([])
 useEffect (()=>{
   async function choises(){
     const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/choices/")
     const result = await response.json();
     setPasirinkimai(result)
   }
-})
+},[])
 
 const [pasirinkimuId, setPasirinkimuId] = useState([])
 useEffect (()=>{
@@ -147,17 +140,24 @@ useEffect (()=>{
     const result = await response.json();
     setPasirinkimuId(result)
   }
-})
+},[])
+
+
+
+
 
 let kategorijos =kategorijos.map((kategorija)=> {
   return <Pressables style={styles.Categories} onPress= {()=> navigation.navigate('Category', {itemId: kategorijos.id })}>
     <Text title = 'category' style ={styles.Category}>{kategorija.pavadinimas}</Text>
   </Pressables>
-})
+},[])
 
 let pasirinkimai = pasirinkimai.map((pasirinkimas)=>{
-  return <Pressable style ={styles.choises} onPress= {()=>navigation.navigate('Choises',{itemId: pasirinkimu.id})>}
-})
+  return <Pressable style ={styles.choises} onPress= {()=>navigation.navigate('Choises',{itemId: pasirinkimu.id})}>
+    <Text title = 'choises' style={styles.choise}>{pasirinkimas.pavadinimas}</Text>
+  </Pressable>
+},[])
+
 
 
   let produktai2 = produktai.map((produktas) => {
@@ -207,6 +207,28 @@ function ProductInfo({route, navigation}) {
   );
 }
 
+function CategoryInfo({route, navigation}){
+  const{itemId, name}= route.params;
+  return (
+    <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+      <View style={styles.container}>
+        <View style={styles.flex1}>
+          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Help')}>
+            <Text style={styles.helpButtonText}>?</Text>
+          </Pressable>
+        </View>
+        
+        <View style={styles.productInfo}>
+          <Text style={styles.productInfoTitle}>{name}</Text>
+         <Text style={styles.CategoryInfo}>categoryId:{id}</Text>
+         <Text style={styles.CategoryInfoTitle}>pavadinimas:{name}</Text>
+        </View>
+
+        <StatusBar style="auto" />
+      </View>
+    </ImageBackground>
+  );
+}
 
 function HelpScreen() {
   return (
@@ -228,6 +250,7 @@ function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Form" component={AppForm} />
         <Stack.Screen name="List" component={ItemList} />
+        <Stack.Screen name="Category" component={CategoryInfo}/>
         <Stack.Screen name="Product" component={ProductInfo} />
         <Stack.Screen name="Help" component={HelpScreen} />
       </Stack.Navigator>
