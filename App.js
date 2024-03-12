@@ -77,10 +77,36 @@ function AppForm({ navigation }) {
 }
 
 const data = [
-  { label: '1 Kategorija', value: '1' },
-  { label: '2 Kategorija', value: '2' },
-  { label: '3 Kategorija', value: '3' },
+  { label: 'Apšvietimas', value: 1 },
+  { label: 'Žaliuzės/Langinės/Venteliacija/Stoglangiai', value: 2 },
+  { label: 'Apsauga', value: 3 },
+  { label: 'Šildymas/Vėdinimas/oro kondicionavimas', value:4},
+  { label: 'Scenos', value:5},
+  { label: 'Energija', value:6},
+  { label: 'Orai', value:7},
+  { label: 'Energija', value:8},
+  { label: 'Orai', value:9},
+  { label: 'Langų ir durų stebėjimas', value:10},
+  { label: 'Vertės rodymas', value:11},
+  { label: 'Laikmačio rodikliai', value:12},
+  { label: 'Galutinio Vartotojo konfiguravimo galimybės', value:13},
+  { label: 'Vartotojo valdymas', value:14},
+  { label: 'Buvimo modeliavimas', value:15},
+  { label: 'Loginęs funkcijos ', value:16},
+  { label: 'Kitų sistemų integravimas', value:17},
+  { label: 'Naršymo integravimas', value:18},
+  { label: 'Multimedija', value:19},
+  { label: 'Pranešimų/pavojaus valdymas', value:20},
+  { label: 'Kamera', value:21},
+  { label: 'Diagramų sudarymas', value:22},
+  { label: 'Nemokama vizualizacija', value:23},
+  { label: 'Sekos', value:24},
+  { label: 'Geografinė užtvara', value:25}
 ];
+
+
+
+
 
 function ItemList({navigation}) {
   let masyvas = [
@@ -135,15 +161,6 @@ useEffect (()=>{
   getChoises()
 },[])
 
-const [pasirinkimuId, setPasirinkimuId] = useState([])
-useEffect (()=>{
-  async function getChoisesId(){
-    const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/choices/(id)")
-    const result = await response.json();
-    setPasirinkimuId(result)
-  }
-  getChoisesId()
-},[])
 
 
 
@@ -252,7 +269,7 @@ function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Form" component={AppForm} />
-        <Stack.Screen name="List" component={ItemList} />
+        
         <Stack.Screen name="Categories" component={CategoryInfo}/>
         <Stack.Screen name="Product" component={ProductInfo} />
         <Stack.Screen name="Help" component={HelpScreen} />
