@@ -103,12 +103,12 @@ function ItemList({navigation}) {
   ]
 
   const [produktai, setProduktai] = useState([])
-
   useEffect(() => {
   async function getProducts() {
   const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/products/");
   const result = await response.json();
   setProduktai(result)
+  console.log(result)
 }
 getProducts()
 }, [])
@@ -120,39 +120,42 @@ useEffect(()=> {
   const result = await response.json();
   setKategorijos(result)
   }
+  getCategories()
 }, [])
 
 
 
 const [pasirinkimai1, setPasirinkimai] = useState([])
 useEffect (()=>{
-  async function choises(){
+  async function getChoises(){
     const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/choices/")
     const result = await response.json();
     setPasirinkimai(result)
   }
+  getChoises()
 },[])
 
 const [pasirinkimuId, setPasirinkimuId] = useState([])
 useEffect (()=>{
-  async function choisesId(){
+  async function getChoisesId(){
     const response = await fetch("https://tomasbudrikas10.eu.pythonanywhere.com/choices/(id)")
     const result = await response.json();
     setPasirinkimuId(result)
   }
+  getChoisesId()
 },[])
 
 
 
 
 
-let kategorijos =kategorijos.map((kategorija)=> {
-  return <Pressables style={styles.Categories} onPress= {()=> navigation.navigate('Category', {itemId: kategorijos.id })}>
+let kategorijos =kategorijos1.map((kategorija)=> {
+  return <Pressable style={styles.Categories} onPress= {()=> navigation.navigate('Category', {itemId: kategorijos.id })}>
     <Text title = 'category' style ={styles.Category}>{kategorija.pavadinimas}</Text>
-  </Pressables>
+  </Pressable>
 },[])
 
-let pasirinkimai = pasirinkimai.map((pasirinkimas)=>{
+let pasirinkimai = pasirinkimai1.map((pasirinkimas)=>{
   return <Pressable style ={styles.choises} onPress= {()=>navigation.navigate('Choises',{itemId: pasirinkimu.id})}>
     <Text title = 'choises' style={styles.choise}>{pasirinkimas.pavadinimas}</Text>
   </Pressable>
@@ -218,8 +221,8 @@ function CategoryInfo({route, navigation}){
           </Pressable>
         </View>
         
-        <View style={styles.productInfo}>
-          <Text style={styles.productInfoTitle}>{name}</Text>
+        <View style={styles.CategoryInfo}>
+          <Text style={styles.CategoryInfo}>{name}</Text>
          <Text style={styles.CategoryInfo}>categoryId:{id}</Text>
          <Text style={styles.CategoryInfoTitle}>pavadinimas:{name}</Text>
         </View>
@@ -250,7 +253,7 @@ function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Form" component={AppForm} />
         <Stack.Screen name="List" component={ItemList} />
-        <Stack.Screen name="Category" component={CategoryInfo}/>
+        <Stack.Screen name="Categories" component={CategoryInfo}/>
         <Stack.Screen name="Product" component={ProductInfo} />
         <Stack.Screen name="Help" component={HelpScreen} />
       </Stack.Navigator>
