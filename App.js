@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet, Text, View, Pressable, ImageBackground, TouchableOpacity, Objects } from 'react-native';
-import React, {useState, useCallback} from 'react';
+import { Button, ScrollView, Modal, StyleSheet, Text, View, Pressable, TouchableWithoutFeedback, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import React, {useState, useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -12,16 +12,16 @@ function HomeScreen({ navigation }) {
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
         <View style={styles.flex1}>
-          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Help')}>
+          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Pagalba')}>
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
         <View style={styles.titleBlock}>
-        <Text style={styles.title}>TAVO POREIKIAI - MŪSŲ PASIŪLYMAI</Text>
+          <Text style={styles.title}>Sveiki!</Text>
           <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
         </View>
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Form')}/>
+          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Klausimynas')}/>
         </View>
         <StatusBar style="auto"/>
       </View>
@@ -29,92 +29,147 @@ function HomeScreen({ navigation }) {
   );
 }
 
-function AppForm({ navigation }) {
+function QuizScreen({ navigation }) {
   const [isOpen1, setOpen1] = useState(false);
   const [currentValue1, setCurrentValue1] = useState([]);
-  const onDropdown1Open = useCallback(() => {
-    setOpen2(false);
-  }, []);
-  const items1 = [
-    {label: 'Pirmas', value: 'a1'},
-    {label: 'Antras', value: 'a2'},
-    {label: 'Trečias', value: 'a3'},
-    {label: 'Ketvirtas', value: 'a4'},
-    {label: 'Penktas', value: 'a5'},
-    {label: 'Šeštas', value: 'a6'},
-    {label: 'Septintas', value: 'a7'},
-    {label: 'Aštuntas', value: 'a8'},
-    {label: 'Devintas', value: 'a9'},
-    {label: 'Dešimtas', value: 'a0'},
-  ];
   const [isOpen2, setOpen2] = useState(false);
   const [currentValue2, setCurrentValue2] = useState([]);
-  const onDropdown2Open = useCallback(() => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [lastValue, setLastValue] = useState([]);
+  const [allCurrentValues, setAllCurrentValues] = useState([]);
+
+  const handleValueChange = (value, setter) => {
+    setter(value);
+    setAllCurrentValues(value);
+    setModalVisible(!modalVisible);
+  };
+
+  const handleDropdown1Open = () => {
+    setOpen2(false);
+  };
+
+  const handleDropdown2Open = () => {
     setOpen1(false);
-  }, []);
-  const items2 = [
-    {label: 'Pirmas', value: 'b1'},
-    {label: 'Antras', value: 'b2'},
-    {label: 'Trečias', value: 'b3'},
+  };
+
+  const itemData = [
+    [
+      {label: 'Pirmas', value: 'a1'},
+      {label: 'Antras', value: 'a2'},
+      {label: 'Trečias', value: 'a3'},
+      {label: 'Ketvirtas', value: 'a4'},
+      {label: 'Penktas', value: 'a5'},
+      {label: 'Šeštas', value: 'a6'},
+      {label: 'Septintas', value: 'a7'},
+    ],
+    [
+      {label: 'Aštuntas', value: 'b1'},
+      {label: 'Devintas', value: 'b2'},
+      {label: 'Dešimtas', value: 'b3'},
+    ],
   ];
+
+  useEffect(() => {
+    setLastValue(allCurrentValues[allCurrentValues.length - 1]);
+  }, [allCurrentValues]);
+
+  const createModalContent = (lastValue) => {
+    const modalData = {
+      a1: { title: 'Pirmas!', text: 'Čia bus 0: "Pirmas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
+      a2: { title: 'Antras!', text: 'Čia bus 0: "Antras" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
+      a3: { title: 'Trečias!', text: 'Čia bus 0: "Trečias" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
+      a4: { title: 'Ketvirtas!', text: 'Čia bus 0: "Ketvirtas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
+      a5: { title: 'Penktas!', text: 'Čia bus 0: "Penktas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
+      a6: { title: 'Šeštas!', text: 'Čia bus 0: "Šeštas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
+      a7: { title: 'Septintas!', text: 'Čia bus 0: "Septintas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
+      b1: { title: 'Aštuntas!', text: 'Čia bus 1: "Aštuntas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
+      b2: { title: 'Devintas!', text: 'Čia bus 1: "Devintas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
+      b3: { title: 'Dešimtas!', text: 'Čia bus 1: "Dešimtas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
+    };
+    const data = modalData[lastValue] || { title: '???', text: 'Nėra tokio pasirinkimo...', imageSource: require('./assets/icon.png') };
+
+    return (
+      <View>
+        <Text style={styles.modalTitle}>{data.title}</Text>
+        <Text style={styles.modalText}>{data.text}</Text>
+        <Image source={data.imageSource} style={styles.modalImage} />
+      </View>
+    );
+  };
 
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
         <View style={styles.flex1}>
-          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Help')}>
+          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Pagalba')}>
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
-        <View style={styles.formFlex}>
-          <Text style={styles.formTitle}>Klausimynas</Text>
+        <View style={styles.quizFlex}>
+          <Text style={styles.quizTitle}>Klausimynas</Text>
+          <Text style={[styles.quizCategoryTitle, {color: '#BEF5EA'}]}>Kategorija: Pirma</Text>
           <DropDownPicker
-            items={items1}
+            items={itemData[0]}
+            value={currentValue1}
+            setValue={(val) => handleValueChange(val, setCurrentValue1)}
             open={isOpen1}
             setOpen={() => setOpen1(!isOpen1)}
-            value={currentValue1}
-            setValue={(val) => setCurrentValue1(val)}
+            onOpen={handleDropdown1Open}
             placeholder='Kategorija: Pirma'
+            dropDownDirection="BOTTOM"
             multiple={true}
             min={0}
             max={10}
             maxHeight={200}
-            onOpen={onDropdown1Open}
             showTickIcon={true}
             theme='DARK'
             mode='BADGE'
+            zIndex={200}
             badgeColors={'black'}
             badgeTextStyle={{color: 'white'}}
-            dropDownDirection="BOTTOM"
-            zIndex={200}
+            selectedItemLabelStyle={{color: '#C1F6A2'}}
+            textStyle={{fontSize: 17, textAlign: 'center', color: 'white'}}
             placeholderStyle={{fontWeight: 'bold'}}
-            style={styles.formCategory}
+            style={styles.quizCategory}
           />
+          <Text style={[styles.quizCategoryTitle, {color: '#F5F4CD'}]}>Kategorija: Antra</Text>
           <DropDownPicker
-            items={items2}
+            items={itemData[1]}
+            value={currentValue2}
+            setValue={(val) => handleValueChange(val, setCurrentValue2)}
             open={isOpen2}
             setOpen={() => setOpen2(!isOpen2)}
-            value={currentValue2}
-            setValue={(val) => setCurrentValue2(val)}
+            onOpen={handleDropdown2Open}
             placeholder='Kategorija: Antra'
+            dropDownDirection="BOTTOM"
             multiple={true}
             min={0}
             max={10}
             maxHeight={200}
-            onOpen={onDropdown2Open}
             showTickIcon={true}
             theme='DARK'
             mode='BADGE'
+            zIndex={100}
             badgeColors={'black'}
             badgeTextStyle={{color: 'white'}}
-            dropDownDirection="BOTTOM"
-            zIndex={100}
+            selectedItemLabelStyle={{color: '#C1F6A2'}}
+            textStyle={{fontSize: 17, textAlign: 'center', color: 'white'}}
             placeholderStyle={{fontWeight: 'bold'}}
-            style={styles.formCategory}
+            style={styles.quizCategory}
           />
+          <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+              <View style={styles.modalOverlay} />
+            </TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                {createModalContent(lastValue)}
+              </ScrollView>
+            </View>
+          </Modal>
         </View>
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#6699FF' onPress={() => navigation.navigate('List', {category1: currentValue1, category2: currentValue2})}/>
+          <Button title='Tęsti' color='#6699FF' onPress={() => navigation.navigate('Sąrašas', {category1: currentValue1, category2: currentValue2})}/>
         </View>
         <StatusBar style="auto"/>
       </View>
@@ -122,7 +177,7 @@ function AppForm({ navigation }) {
   );
 }
 
-function ItemList({route, navigation}) {
+function ItemListScreen({route, navigation}) {
   const {category1, category2} = route.params;
   const myJSON1 = JSON.stringify(category1);
   const getValue1 = JSON.parse(myJSON1);
@@ -134,7 +189,7 @@ function ItemList({route, navigation}) {
   getValue1.forEach((category) => {
     index = index+1;
     results.push(
-      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Product', {itemId: category})}>
+      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Produktas', {itemId: category})}>
         <Text style={styles.product}>{index}. Produktas</Text>
         <Text style={styles.productAfter}>Kategorija: {category}</Text>
       </TouchableOpacity>
@@ -143,7 +198,7 @@ function ItemList({route, navigation}) {
   getValue2.forEach((category) => {
     index = index+1;
     results.push(
-      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Product', {itemId: category})}>
+      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Produktas', {itemId: category})}>
         <Text style={styles.product}>{index}. Produktas</Text>
         <Text style={styles.productAfter}>Kategorija: {category}</Text>
       </TouchableOpacity>
@@ -154,7 +209,7 @@ function ItemList({route, navigation}) {
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
         <View style={styles.flex1}>
-          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Help')}>
+          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Pagalba')}>
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
@@ -162,22 +217,20 @@ function ItemList({route, navigation}) {
           <Text style={styles.listTitle}>Produktai:</Text>
           <Text style={styles.listCategories}>Kategorijos: {getValue1}, {getValue2}</Text>
           {results}
-        </View>
-        
-        
+        </View>        
         <StatusBar style="auto" />
       </View>
     </ImageBackground>
   );
 }
 
-function ProductInfo({route, navigation}) {
+function ProductInfoScreen({route, navigation}) {
   const {itemId} = route.params;
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
         <View style={styles.flex1}>
-          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Help')}>
+          <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Pagalba')}>
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
@@ -192,9 +245,9 @@ function ProductInfo({route, navigation}) {
   );
 }
 
- function HelpScreen() {
-     return (
-       <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+function HelpScreen() {
+  return (
+    <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
          <View style={styles.container}>
            <Text style={styles.helpTitle}>Kam reikalinga šį programa?</Text>
@@ -213,18 +266,18 @@ function ProductInfo({route, navigation}) {
          </View>
          </ScrollView>
        </ImageBackground>
-     );
-   }
+  );
+}
 
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen}/>
-        <Stack.Screen name="Form" component={AppForm}/>
-        <Stack.Screen name="List" component={ItemList}/>
-        <Stack.Screen name="Product" component={ProductInfo}/>
-        <Stack.Screen name="Help" component={HelpScreen}/>
+      <Stack.Navigator initialRouteName="Sveiki">
+        <Stack.Screen name="Sveiki" component={HomeScreen}/>
+        <Stack.Screen name="Klausimynas" component={QuizScreen}/>
+        <Stack.Screen name="Sąrašas" component={ItemListScreen}/>
+        <Stack.Screen name="Produktas" component={ProductInfoScreen}/>
+        <Stack.Screen name="Pagalba" component={HelpScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -233,6 +286,36 @@ function App() {
 export default App;
 
 const styles = StyleSheet.create({
+  modalImage: {
+    width: 320,
+    height: 320,
+    marginTop: 15,
+  },
+  modalText: {
+    fontSize: 17,
+    color: 'black',
+    marginTop: 5
+  },
+  modalTitle: {
+    fontSize: 23,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center'
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  scrollViewContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: 'transparent',
@@ -252,7 +335,6 @@ const styles = StyleSheet.create({
     fontSize: 60,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 20,
   },
   text1: {
     fontSize: 20,
@@ -298,28 +380,31 @@ const styles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  flex2: {
-    flex: 1,
-  },
   buttonNext: {
     width: 200, 
     height: 70,
   },
-  formFlex: {
+  quizFlex: {
     flex: 1, 
     width: '100%', 
     position: 'absolute', 
     alignItems: 'center', 
     marginTop: 50
   },
-  formTitle: {
+  quizTitle: {
     fontSize: 40, 
     fontWeight: 'bold', 
     color: 'white',
-    marginBottom: 10
+    marginBottom: 15
   },
-  formCategory: {
-    marginVertical: 5
+  quizCategoryTitle: {
+    fontSize: 19,
+    fontWeight: '500',
+    marginLeft: 15,
+    marginBottom: 7
+  },
+  quizCategory: {
+    marginBottom: 15,
   },
   listFlex: {
     flex: 1, 
@@ -385,7 +470,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// cd .../LankstusisProgramavimasFrontend
 // npm install (node_modules)
 // npm run start (qr code)
 // npm run android (qr code + paleidimas per android pc)
