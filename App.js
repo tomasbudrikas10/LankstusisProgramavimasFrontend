@@ -1,12 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, Modal, StyleSheet, Text, View, Pressable, TouchableWithoutFeedback, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { Button, ScrollView, Modal, StyleSheet, Text, View, Pressable, TouchableWithoutFeedback, ImageBackground, Image, TouchableOpacity, TextInput } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
-
+ 
 const Stack = createNativeStackNavigator();
-
+ 
 function HomeScreen({ navigation }) {
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
@@ -28,7 +28,7 @@ function HomeScreen({ navigation }) {
     </ImageBackground>
   );
 }
-
+ 
 function QuizScreen({ navigation }) {
   const [isOpen1, setOpen1] = useState(false);
   const [currentValue1, setCurrentValue1] = useState([]);
@@ -37,21 +37,21 @@ function QuizScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [lastValue, setLastValue] = useState([]);
   const [allCurrentValues, setAllCurrentValues] = useState([]);
-
+ 
   const handleValueChange = (value, setter) => {
     setter(value);
     setAllCurrentValues(value);
     setModalVisible(!modalVisible);
   };
-
+ 
   const handleDropdown1Open = () => {
     setOpen2(false);
   };
-
+ 
   const handleDropdown2Open = () => {
     setOpen1(false);
   };
-
+ 
   const itemData = [
     [
       {label: 'Pirmas', value: 'a1'},
@@ -68,11 +68,11 @@ function QuizScreen({ navigation }) {
       {label: 'Dešimtas', value: 'b3'},
     ],
   ];
-
+ 
   useEffect(() => {
     setLastValue(allCurrentValues[allCurrentValues.length - 1]);
   }, [allCurrentValues]);
-
+ 
   const createModalContent = (lastValue) => {
     const modalData = {
       a1: { title: 'Pirmas!', text: 'Čia bus 0: "Pirmas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
@@ -87,7 +87,7 @@ function QuizScreen({ navigation }) {
       b3: { title: 'Dešimtas!', text: 'Čia bus 1: "Dešimtas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
     };
     const data = modalData[lastValue] || { title: '???', text: 'Nėra tokio pasirinkimo...', imageSource: require('./assets/icon.png') };
-
+ 
     return (
       <View>
         <Text style={styles.modalTitle}>{data.title}</Text>
@@ -96,7 +96,7 @@ function QuizScreen({ navigation }) {
       </View>
     );
   };
-
+ 
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
@@ -176,7 +176,7 @@ function QuizScreen({ navigation }) {
     </ImageBackground>
   );
 }
-
+ 
 function ItemListScreen({route, navigation}) {
   const {category1, category2} = route.params;
   const myJSON1 = JSON.stringify(category1);
@@ -185,7 +185,7 @@ function ItemListScreen({route, navigation}) {
   const getValue2 = JSON.parse(myJSON2);
   let index = 0;
   const results = [];
-
+ 
   getValue1.forEach((category) => {
     index = index+1;
     results.push(
@@ -204,7 +204,7 @@ function ItemListScreen({route, navigation}) {
       </TouchableOpacity>
     )
   })
-
+ 
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
@@ -223,7 +223,7 @@ function ItemListScreen({route, navigation}) {
     </ImageBackground>
   );
 }
-
+ 
 function ProductInfoScreen({route, navigation}) {
   const {itemId} = route.params;
   return (
@@ -244,31 +244,99 @@ function ProductInfoScreen({route, navigation}) {
     </ImageBackground>
   );
 }
-
-function HelpScreen() {
+ 
+function HelpScreen({ navigation }) {
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-         <View style={styles.container}>
-           <Text style={styles.helpTitle}>Kam reikalinga šį programa?</Text>
-           <Text style={styles.helpText}>Ši programa leidžia vartotojui surasti jam tinkamą išmaniūjų namų sistemą.....</Text>
-           <Text style={styles.helpTitle}>Kaip naudotis programa?</Text>
-           <Text style={styles.helpText}>1. Pradinio lango apačioje matomas mygtukas 'tęsti', kurį paspaudus jūs busite nuvedamas į klausimyną. </Text>
-           <Text style={styles.helpText}>2. Klausimyno lange jums reikia pasirinkti kūrią kategoriją norite pasirinkti.</Text>
-           <Text style={styles.helpText}>3. Pasirinkę kategoriją ir paspaudę mygtuką tęsti, jums bus rodoma produkto išsami informacija.</Text>
-           <Text style={styles.helpText}>4. Viršui kairėje paspaudūs mygtuką su atbuline rodykle, jūs būsite gražinamas į praeitą langą. </Text>
-           <Text style={styles.helpTitle}>Kas dare šią programą?</Text>
-           <Text style={styles.helpText}>Šia programą darė keturi Klaipėdos valstybinės kolegijos antro kurso informatikos studentai, kurie turėjo savo pareigas ir atsakomybes:</Text>
-           <Text style={styles.helpText}>Tomas Budrikas - Fullstack</Text>
-           <Text style={styles.helpText}>Meida Ivanauskaitė - Frontend</Text>
-           <Text style={styles.helpText}>Lukas Raišuotis - Backend</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.helpTitle}>Kam reikalinga ši programa?</Text>
+          <Text style={styles.helpText}>Ši programa leidžia vartotojui surasti jam tinkamą išmaniūjų namų sistemą.....</Text>
+          <Text style={styles.helpTitle}>Kaip naudotis programa?</Text>
+          <Text style={styles.helpText}>1. Pradinio lango apačioje matomas mygtukas 'tęsti', kurį paspaudus jūs busite nuvedamas į klausimyną. </Text>
+          <Text style={styles.helpText}>2. Klausimyno lange jums reikia pasirinkti kūrią kategoriją norite pasirinkti.</Text>
+          <Text style={styles.helpText}>3. Pasirinkę kategoriją ir paspaudę mygtuką tęsti, jums bus rodoma produkto išsami informacija.</Text>
+          <Text style={styles.helpText}>4. Viršui kairėje paspaudūs mygtuką su atbuline rodykle, jūs būsite gražinamas į praeitą langą. </Text>
+          <Text style={styles.helpTitle}>Kas dare šią programą?</Text>
+          <Text style={styles.helpText}>Šia programą darė keturi Klaipėdos valstybinės kolegijos antro kurso informatikos studentai, kurie turėjo savo pareigas ir atsakomybes:</Text>
+          <Text style={styles.helpText}>Tomas Budrikas - Fullstack</Text>
+          <Text style={styles.helpText}>Meida Ivanauskaitė - Frontend</Text>
+          <Text style={styles.helpText}>Lukas Raišuotis - Backend</Text>
           <Text style={styles.helpText}>Karolis Kleinauskas - Duomenų bazės</Text>
-         </View>
-         </ScrollView>
-       </ImageBackground>
+          <TouchableOpacity style={styles.feedbackButton} onPress={() => navigation.navigate('Atsiliepimai')}>
+            <Text style={styles.feedbackButtonText}>Feedback</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 }
-
+ 
+function FeedbackScreen({ navigation }) {
+  const [rating, setRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [showModal, setShowModal] = useState(false);
+ 
+  const handleSubmit = () => {
+    console.log('Rating:', rating);
+    console.log('Feedback Text:', feedbackText);
+ 
+    setShowModal(true);
+  };
+ 
+  const handleContinue = () => {
+    setShowModal(false);
+ 
+    navigation.navigate('Sveiki');
+  };
+ 
+  return (
+    <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+      <View style={styles.container}>
+        <Text style={styles.feedbackTitle}>Atsiliepimai</Text>
+ 
+        <Text style={styles.label}>Įvertinkite savo patirtį (1-5)</Text>
+        <View style={styles.ratingContainer}>
+          {[1, 2, 3, 4, 5].map((value) => (
+            <TouchableOpacity
+              key={value}
+              style={[styles.ratingItem, value <= rating && styles.selectedRatingItem]}
+              onPress={() => setRating(value)}>
+              <Text style={styles.ratingText}>{value}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+ 
+        <Text style={styles.label}>Padėkite mums tobulėti</Text>
+        <TextInput
+          style={styles.feedbackTextInput}
+          multiline
+          numberOfLines={4}
+          placeholder="Jūsų atsiliepimas"
+          value={feedbackText}
+          onChangeText={(text) => setFeedbackText(text)}
+        />
+ 
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Siūsti</Text>
+        </TouchableOpacity>
+ 
+        {showModal && (
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Ačiū už atsiliepimą!</Text>
+              <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+                <Text style={styles.continueButtonText}>Tęsti</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </View>
+    </ImageBackground>
+);
+}
+ 
+ 
 function App() {
   return (
     <NavigationContainer>
@@ -278,13 +346,14 @@ function App() {
         <Stack.Screen name="Sąrašas" component={ItemListScreen}/>
         <Stack.Screen name="Produktas" component={ProductInfoScreen}/>
         <Stack.Screen name="Pagalba" component={HelpScreen}/>
+        <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
+ 
 export default App;
-
+ 
 const styles = StyleSheet.create({
   modalImage: {
     width: 320,
@@ -381,19 +450,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonNext: {
-    width: 200, 
+    width: 200,
     height: 70,
   },
   quizFlex: {
-    flex: 1, 
-    width: '100%', 
-    position: 'absolute', 
-    alignItems: 'center', 
+    flex: 1,
+    width: '100%',
+    position: 'absolute',
+    alignItems: 'center',
     marginTop: 50
   },
   quizTitle: {
-    fontSize: 40, 
-    fontWeight: 'bold', 
+    fontSize: 40,
+    fontWeight: 'bold',
     color: 'white',
     marginBottom: 15
   },
@@ -407,10 +476,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   listFlex: {
-    flex: 1, 
-    width: '100%', 
-    position: 'absolute', 
-    alignItems: 'center', 
+    flex: 1,
+    width: '100%',
+    position: 'absolute',
+    alignItems: 'center',
     marginTop: 50
   },
   listTitle: {
@@ -422,12 +491,12 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   listItem: {
-    width: '100%', 
+    width: '100%',
     marginVertical: 5,
-    borderColor: '#313143', 
-    borderWidth: 1, 
-    borderStyle: 'solid', 
-    borderRadius: 10, 
+    borderColor: '#313143',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 10,
     padding: 8,
     backgroundColor: '#313143',
   },
@@ -441,35 +510,121 @@ const styles = StyleSheet.create({
     marginLeft: 24
   },
   helpTitle: {
-    fontSize: 35, 
-    fontWeight: 'bold', 
-    marginTop: 25, 
-    marginBottom: 10, 
+    fontSize: 35,
+    fontWeight: 'bold',
+    marginTop: 25,
+    marginBottom: 10,
     color: 'white'
-  }, 
+  },
   helpText: {
     fontSize: 16,
-    marginTop: 10, 
+    marginTop: 10,
     color: 'white',
     width: 330
-  }, 
+  },
   productInfo: {
     top: -480,
-    width: 320, 
+    width: 320,
   },
   productInfoTitle: {
-    fontSize: 30, 
-    fontWeight: 'bold', 
-    textAlign: 'center', 
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
     color: 'white',
   },
   productInfoText: {
-    fontSize: 16, 
+    fontSize: 16,
     color: 'white',
     top: 10
+  },feedbackTitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    color: '#fff',
+    alignSelf: 'flex-start',
+    marginLeft: 20,
+    marginBottom: 5,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  ratingItem: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
+  },
+  selectedRatingItem: {
+    backgroundColor: '#6699FF',
+  },
+  ratingText: {
+    fontSize: 16,
+    color: '#6699FF',
+  },
+  feedbackTextInput: {
+    width: '80%',
+    height: 120,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 20,
+  },
+  submitButton: {
+    backgroundColor: '#6699FF',
+    width: '80%',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  feedbackButton: {
+    backgroundColor: '#6699FF',
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  feedbackButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  continueButton: {
+    backgroundColor: '#6699FF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  continueButtonText: {
+    fontSize: 16,
+    color: '#fff',
   },
 });
-
+ 
 // npm install (node_modules)
 // npm run start (qr code)
 // npm run android (qr code + paleidimas per android pc)
