@@ -4,9 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Dropdown } from 'react-native-element-dropdown';
+import { UseTranslation} from 'react-i18next';
+import i18next from './Services/i18next';
+
 
 const Stack = createNativeStackNavigator();
+
 function HomeScreen({ navigation }) {
+  // const {t} = useTranslation();
+
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
@@ -14,10 +20,14 @@ function HomeScreen({ navigation }) {
           <Pressable style={styles.helpButton} onPress={() => navigation.navigate('Help')}>
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
+          <Pressable style={styles.change} onPress={() => (true)}>
+            <Text style={styles.helpButtonText}>?</Text>
+          </Pressable>
         </View>
 
+
         <View style={styles.titleBlock}>
-          <Text style={styles.title}>Sveiki!</Text>
+          <Text style={styles.title}>{'Sveiki!'}</Text>
           <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
         </View>
 
@@ -104,6 +114,9 @@ const data = [
   { label: 'Geografinė užtvara', value:25}
 ];
 
+
+
+
 function ItemList({navigation}) {
   let masyvas = [
     {
@@ -156,10 +169,6 @@ useEffect (()=>{
   }
   getChoises()
 },[])
-
-
-
-
 
 
 let kategorijos =kategorijos1.map((kategorija)=> {
@@ -320,7 +329,7 @@ const styles = StyleSheet.create({
     top: -385
   },
   item: {
-    padding: 15,
+    padding: 17,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -331,7 +340,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: 17,
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -348,11 +357,24 @@ const styles = StyleSheet.create({
     elevation: 5,
     backgroundColor: '#6699FF',
   },
+  change:{
+    position: 'fixed',
+    marginTop: 20,
+    right: 150,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 50,
+    elevation: 5,
+    backgroundColor: '#6699FF',
+  },
+
   helpButtonText: {
     fontSize: 20,
     lineHeight: 25,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'blue',
   },
   flex1: {
     flex: 1,
