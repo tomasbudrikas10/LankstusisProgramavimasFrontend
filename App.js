@@ -379,7 +379,7 @@ function RegisterOrLogin({ navigation }) {
       id: index,
       text: err
     }}))
-
+    setRegisterResult("")
     if (errors.length === 0) {
       fetch("http://tomasbudrikas10.eu.pythonanywhere.com/users/", {
         method: "POST",
