@@ -104,10 +104,6 @@ const data = [
   { label: 'Geografinė užtvara', value:25}
 ];
 
-
-
-
-
 function ItemList({navigation}) {
   let masyvas = [
     {
@@ -269,7 +265,7 @@ function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Form" component={AppForm} />
-        
+        <Stack.Screen name="List" component={ItemList} />
         <Stack.Screen name="Categories" component={CategoryInfo}/>
         <Stack.Screen name="Product" component={ProductInfo} />
         <Stack.Screen name="Help" component={HelpScreen} />
