@@ -1,5 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, Modal, StyleSheet, Text, View, Pressable, TouchableWithoutFeedback, ImageBackground, Image, TouchableOpacity, TextInput } from 'react-native';
+import {
+  Button,
+  ScrollView,
+  Modal,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TouchableWithoutFeedback,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  FlatList
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -345,11 +359,55 @@ function RegisterOrLogin({ navigation }) {
   const [registerNameValue, setRegisterNameValue] = useState("")
   const [registerPasswordValue, setRegisterPasswordValue] = useState("")
   const [registerConfirmPasswordValue, setRegisterConfirmPasswordValue] = useState("")
+  const [registerErrors, setRegisterErrors] = useState([])
+  const [registerResult, setRegisterResult] = useState("")
   function handleRegisterSubmit() {
-    console.log(dropdownValue)
-    console.log(registerNameValue)
-    console.log(registerPasswordValue)
-    console.log(registerConfirmPasswordValue)
+    let errors = []
+    if (dropdownValue === null) {
+      errors.push("Pasirinkite paskyros tipą")
+    }
+    if (registerNameValue.trim() === "") {
+      errors.push("Įveskitę vartotojo vardą")
+    }
+    if (registerPasswordValue.trim() === "") {
+      errors.push("Įveskite slaptažodį")
+    }
+    if (registerConfirmPasswordValue.trim() !== registerPasswordValue.trim()) {
+      errors.push("Slaptažodžiai nesutampa")
+    }
+    setRegisterErrors(errors.map((err, index) => {return {
+      id: index,
+      text: err
+    }}))
+
+    if (errors.length === 0) {
+      fetch("http://tomasbudrikas10.eu.pythonanywhere.com/users/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "name": registerNameValue,
+          "password": registerPasswordValue,
+          "role": dropdownValue
+        }),
+      })
+          .then(result => result.json())
+          .then(json => {
+            if (json.hasOwnProperty("errors")) {
+              setRegisterErrors(json.errors.map((error, index) => {
+                return {id: index, text: error}
+              }))
+            }
+            if (json.hasOwnProperty("message")) {
+              setRegisterResult(json.message)
+            } else {
+              setRegisterResult("Nepavyko prisiregistruoti.")
+            }
+          })
+          .catch(error => console.error(error))
+    }
   }
   function handleLoginSubmit() {
     console.log(loginNameValue)
@@ -359,7 +417,7 @@ function RegisterOrLogin({ navigation }) {
       <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
         { isOnRegisterScreen ?
             (<View style={styles.container}>
-                <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate('Sveiki')}>
+              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate('Sveiki')}>
                   <Text style={styles.registerOrLoginButtonText}>Grįžti Atgal</Text>
                 </TouchableOpacity>
               <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(false)}>
@@ -367,6 +425,21 @@ function RegisterOrLogin({ navigation }) {
               </TouchableOpacity>
                 <Text style={styles.title}>Registracija</Text>
                 <View style={styles.registerLoginForm}>
+                {registerErrors.length > 0 && (
+                  <FlatList
+                      data={registerErrors}
+                      renderItem={({ item }) => {
+                        return (
+                            <Text style={{color: "red"}}>{"* " + item.text}</Text>
+                      )}
+                      }
+                      style={{gap: 10}}
+                      keyExtractor={(item, index) => index.toString()}
+                  />)
+                }
+                  {registerResult !== "" && (
+                      <Text>{registerResult}</Text>
+                  )}
                   <DropDownPicker
                       items={[
                           {label: "Vartotojas", value: "user"},
@@ -439,9 +512,10 @@ const styles = StyleSheet.create({
   },
   registerOrLoginButton: {
     backgroundColor: 'rgb(51, 153, 255)',
-    marginTop: 20,
+    marginTop: 10,
+    fontWeight: 'bold',
     width: '90%',
-    padding: 10,
+    padding: 5,
     borderRadius: 10,
   },
   registerOrLoginButtonText: {
@@ -461,7 +535,7 @@ const styles = StyleSheet.create({
   registerLoginForm: {
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 25,
-    height: '65%',
+    height: '70%',
     padding: 50,
     marginTop: 20,
     width: '90%',
