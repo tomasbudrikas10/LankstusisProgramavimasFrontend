@@ -21,7 +21,7 @@ function HomeScreen({ navigation }) {
           <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
         </View>
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Klausimynas')}/>
+          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('RegistracijaPrisijungimas')}/>
         </View>
         <StatusBar style="auto"/>
       </View>
@@ -335,7 +335,83 @@ function FeedbackScreen({ navigation }) {
     </ImageBackground>
 );
 }
- 
+
+function RegisterOrLogin({ navigation }) {
+  const [isOnRegisterScreen, setIsOnRegisterScreen] = useState(true)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [dropdownValue, setDropdownValue] = useState(null)
+  const [loginNameValue, setLoginNameValue] = useState("")
+  const [loginPasswordValue, setLoginPasswordValue] = useState("")
+  const [registerNameValue, setRegisterNameValue] = useState("")
+  const [registerPasswordValue, setRegisterPasswordValue] = useState("")
+  const [registerConfirmPasswordValue, setRegisterConfirmPasswordValue] = useState("")
+  function handleRegisterSubmit() {
+    console.log(dropdownValue)
+    console.log(registerNameValue)
+    console.log(registerPasswordValue)
+    console.log(registerConfirmPasswordValue)
+  }
+  function handleLoginSubmit() {
+    console.log(loginNameValue)
+    console.log(loginPasswordValue)
+  }
+  return (
+      <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+        { isOnRegisterScreen ?
+            (<View style={styles.container}>
+                <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate('Sveiki')}>
+                  <Text style={styles.registerOrLoginButtonText}>Grįžti Atgal</Text>
+                </TouchableOpacity>
+              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(false)}>
+                <Text style={styles.registerOrLoginButtonText}>Eiti Į Prisijungimo Langą</Text>
+              </TouchableOpacity>
+                <Text style={styles.title}>Registracija</Text>
+                <View style={styles.registerLoginForm}>
+                  <DropDownPicker
+                      items={[
+                          {label: "Vartotojas", value: "user"},
+                          {label: "Administratorius", value: "admin"},
+                          {label: "Įmonė", value: "company"},
+                      ]}
+                      value={dropdownValue}
+                      setValue={setDropdownValue}
+                      open={isDropdownOpen}
+                      setOpen={setIsDropdownOpen}
+                      placeholder='Pasirinkite paskyros tipą'
+                      dropDownDirection="BOTTOM"
+                      multiple={false}
+                      maxHeight={200}
+                      textStyle={{fontSize: 17, color: 'black'}}
+                      placeholderStyle={{fontWeight: 'bold'}}
+                  />
+                  <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę vartotojo vardą"} value={registerNameValue} onChangeText={setRegisterNameValue}/>
+                  <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę slaptažodį"} value={registerPasswordValue} onChangeText={setRegisterPasswordValue} secureTextEntry={true}/>
+                  <TextInput style={styles.registerLoginInput} placeholder={"Patvirtinkite slaptažodį"} value={registerConfirmPasswordValue} onChangeText={setRegisterConfirmPasswordValue} secureTextEntry={true}/>
+                  <TouchableOpacity style={{...styles.registerOrLoginButton, width: '100%'}} onPress={handleRegisterSubmit}>
+                    <Text style={styles.registerOrLoginButtonText}>Prisiregistruoti</Text>
+                  </TouchableOpacity>
+                </View>
+            </View>) :
+            (<View style={styles.container}>
+              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate('Sveiki')}>
+                <Text style={styles.registerOrLoginButtonText}>Grįžti Atgal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(true)}>
+                <Text style={styles.registerOrLoginButtonText}>Eiti Į Registracijos Langą</Text>
+              </TouchableOpacity>
+              <Text style={styles.title}>Prisijungimas</Text>
+              <View style={styles.registerLoginForm}>
+                <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę vartotojo vardą"} value={loginNameValue} onChangeText={setLoginNameValue}/>
+                <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę slaptažodį"} value={loginPasswordValue} onChangeText={setLoginPasswordValue} secureTextEntry={true}/>
+                <TouchableOpacity style={{...styles.registerOrLoginButton, width: '100%'}} onPress={handleLoginSubmit}>
+                  <Text style={styles.registerOrLoginButtonText}>Prisijungti</Text>
+                </TouchableOpacity>
+              </View>
+            </View>)
+        }
+      </ImageBackground>
+  )
+}
  
 function App() {
   return (
@@ -347,6 +423,7 @@ function App() {
         <Stack.Screen name="Produktas" component={ProductInfoScreen}/>
         <Stack.Screen name="Pagalba" component={HelpScreen}/>
         <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
+        <Stack.Screen name="RegistracijaPrisijungimas" component={RegisterOrLogin}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -359,6 +436,36 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     marginTop: 15,
+  },
+  registerOrLoginButton: {
+    backgroundColor: 'rgb(51, 153, 255)',
+    marginTop: 20,
+    width: '90%',
+    padding: 10,
+    borderRadius: 10,
+  },
+  registerOrLoginButtonText: {
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 20,
+  },
+  registerLoginInput: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    textAlign: "center",
+    padding: 5,
+  },
+  registerLoginInputLabel: {
+    textAlign: "center",
+  },
+  registerLoginForm: {
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 25,
+    height: '65%',
+    padding: 50,
+    marginTop: 20,
+    width: '90%',
+    gap: 25
   },
   modalText: {
     fontSize: 17,
