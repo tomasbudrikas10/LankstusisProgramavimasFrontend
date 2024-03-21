@@ -18,11 +18,17 @@ import React, {useState, useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { translate } from './translate.js';
+
+
+ 
  
 const Stack = createNativeStackNavigator();
  
 function HomeScreen({ navigation }) {
+   const [language, setLanguage] = useState('lt');
   return (
+   
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <View style={styles.container}>
         <View style={styles.flex1}>
@@ -31,15 +37,16 @@ function HomeScreen({ navigation }) {
           </Pressable>
         </View>
         <View style={styles.titleBlock}>
-          <Text style={styles.title}>Sveiki!</Text>
+          <Text style={styles.title}>Sveiki</Text>
           <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
         </View>
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('RegistracijaPrisijungimas')}/>
+          <Button title={translate('continue', language)} color='#557FD5' onPress={() => navigation.navigate('Klausimynas')}/>
         </View>
         <StatusBar style="auto"/>
       </View>
     </ImageBackground>
+    
   );
 }
  
@@ -260,23 +267,24 @@ function ProductInfoScreen({route, navigation}) {
 }
  
 function HelpScreen({ navigation }) {
+   const [language, setLanguage] = useState('lt');
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <Text style={styles.helpTitle}>Kam reikalinga ši programa?</Text>
-          <Text style={styles.helpText}>Ši programa leidžia vartotojui surasti jam tinkamą išmaniūjų namų sistemą.....</Text>
-          <Text style={styles.helpTitle}>Kaip naudotis programa?</Text>
-          <Text style={styles.helpText}>1. Pradinio lango apačioje matomas mygtukas 'tęsti', kurį paspaudus jūs busite nuvedamas į klausimyną. </Text>
-          <Text style={styles.helpText}>2. Klausimyno lange jums reikia pasirinkti kūrią kategoriją norite pasirinkti.</Text>
-          <Text style={styles.helpText}>3. Pasirinkę kategoriją ir paspaudę mygtuką tęsti, jums bus rodoma produkto išsami informacija.</Text>
-          <Text style={styles.helpText}>4. Viršui kairėje paspaudūs mygtuką su atbuline rodykle, jūs būsite gražinamas į praeitą langą. </Text>
-          <Text style={styles.helpTitle}>Kas dare šią programą?</Text>
-          <Text style={styles.helpText}>Šia programą darė keturi Klaipėdos valstybinės kolegijos antro kurso informatikos studentai, kurie turėjo savo pareigas ir atsakomybes:</Text>
+          <Text style={styles.helpTitle}>{translate('title1', language)}</Text>
+          <Text style={styles.helpText}>{translate('desc1', language)}</Text>
+          <Text style={styles.helpTitle}>{translate('title2', language)}</Text>
+          <Text style={styles.helpText}>{translate('desc2', language)}</Text>
+          <Text style={styles.helpText}>{translate('desc3', language)}</Text>
+          <Text style={styles.helpText}>{translate('desc4', language)}</Text>
+          <Text style={styles.helpText}>{translate('desc5', language)} </Text>
+          <Text style={styles.helpTitle}>{translate('title3', language)}</Text>
+          <Text style={styles.helpText}>{translate('desc6', language)}</Text>
           <Text style={styles.helpText}>Tomas Budrikas - Fullstack</Text>
           <Text style={styles.helpText}>Meida Ivanauskaitė - Frontend</Text>
           <Text style={styles.helpText}>Lukas Raišuotis - Backend</Text>
-          <Text style={styles.helpText}>Karolis Kleinauskas - Duomenų bazės</Text>
+          <Text style={styles.helpText}>{translate('desc7', language)}</Text>
           <TouchableOpacity style={styles.feedbackButton} onPress={() => navigation.navigate('Atsiliepimai')}>
             <Text style={styles.feedbackButtonText}>Feedback</Text>
           </TouchableOpacity>
@@ -487,6 +495,13 @@ function RegisterOrLogin({ navigation }) {
 }
  
 function App() {
+  const [language, setLanguage] = useState('lt');
+
+  const changeLanguage = () => {
+    
+    const newLanguage = language === 'lt' ? 'en' : 'lt';
+    setLanguage(newLanguage);
+  };
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Sveiki">
@@ -498,6 +513,9 @@ function App() {
         <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
         <Stack.Screen name="RegistracijaPrisijungimas" component={RegisterOrLogin}/>
       </Stack.Navigator>
+       <Pressable style={styles.change} onPress={changeLanguage}>
+        <Text style={styles.helpButtonText}>{language === 'lt' ? 'change to EN' : 'keisti į LT'}</Text>
+      </Pressable>
     </NavigationContainer>
   );
 }
@@ -608,6 +626,19 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: 16,
+  },
+
+  change:{
+    position: 'fixed',
+    marginTop: 0,
+    right: 150,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 50,
+    elevation: 5,
+    backgroundColor: '#6699FF',
   },
   helpButton: {
     position: 'fixed',
