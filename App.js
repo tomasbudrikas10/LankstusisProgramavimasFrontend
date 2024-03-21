@@ -25,8 +25,7 @@ import { translate } from './translate.js';
  
 const Stack = createNativeStackNavigator();
  
-function HomeScreen({ navigation }) {
-   const [language, setLanguage] = useState('lt');
+function HomeScreen({ navigation, language }) {
   return (
    
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
@@ -266,8 +265,7 @@ function ProductInfoScreen({route, navigation}) {
   );
 }
  
-function HelpScreen({ navigation }) {
-   const [language, setLanguage] = useState('lt');
+function HelpScreen({ navigation, language }) {
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -505,16 +503,20 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Sveiki">
-        <Stack.Screen name="Sveiki" component={HomeScreen}/>
+        <Stack.Screen name="Sveiki">
+          {(props) => <HomeScreen {...props} language={language}></HomeScreen>}
+        </Stack.Screen>
         <Stack.Screen name="Klausimynas" component={QuizScreen}/>
         <Stack.Screen name="Sąrašas" component={ItemListScreen}/>
         <Stack.Screen name="Produktas" component={ProductInfoScreen}/>
-        <Stack.Screen name="Pagalba" component={HelpScreen}/>
+        <Stack.Screen name="Pagalba">
+          {(props) => <HelpScreen {...props} language={language}></HelpScreen>}
+        </Stack.Screen>
         <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
         <Stack.Screen name="RegistracijaPrisijungimas" component={RegisterOrLogin}/>
       </Stack.Navigator>
-       <Pressable style={styles.change} onPress={changeLanguage}>
-        <Text style={styles.helpButtonText}>{language === 'lt' ? 'change to EN' : 'keisti į LT'}</Text>
+       <Pressable onPress={changeLanguage}>
+        <Text>{language === 'lt' ? 'change to EN' : 'keisti į LT'}</Text>
       </Pressable>
     </NavigationContainer>
   );
