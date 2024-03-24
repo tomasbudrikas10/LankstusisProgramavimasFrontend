@@ -15,7 +15,7 @@ import {
   FlatList
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import {NavigationContainer, useFocusEffect, useIsFocused} from '@react-navigation/native';
+import {NavigationContainer, useFocusEffect, useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,7 +35,7 @@ function HomeScreen({ navigation }) {
           <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
         </View>
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('RegistracijaPrisijungimas')}/>
+          <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Klausimynas')}/>
         </View>
         <StatusBar style="auto"/>
       </View>
@@ -464,9 +464,6 @@ function RegisterOrLogin({ navigation }) {
       <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
         { isOnRegisterScreen ?
             (<View style={styles.container}>
-              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate('Sveiki')}>
-                  <Text style={styles.registerOrLoginButtonText}>Grįžti Atgal</Text>
-                </TouchableOpacity>
               <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(false)}>
                 <Text style={styles.registerOrLoginButtonText}>Eiti Į Prisijungimo Langą</Text>
               </TouchableOpacity>
@@ -513,9 +510,6 @@ function RegisterOrLogin({ navigation }) {
                 </View>
             </View>) :
             (<View style={styles.container}>
-              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate('Sveiki')}>
-                <Text style={styles.registerOrLoginButtonText}>Grįžti Atgal</Text>
-              </TouchableOpacity>
               <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(true)}>
                 <Text style={styles.registerOrLoginButtonText}>Eiti Į Registracijos Langą</Text>
               </TouchableOpacity>
@@ -876,7 +870,9 @@ function EditProductScreen({route, navigation}) {
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Sveiki">
+      <Stack.Navigator initialRouteName="Sveiki" screenOptions={{
+        header: () => null
+      }}>
         <Stack.Screen name="Sveiki" component={HomeScreen}/>
         <Stack.Screen name="Klausimynas" component={QuizScreen}/>
         <Stack.Screen name="Sąrašas" component={ItemListScreen}/>
@@ -889,8 +885,49 @@ function App() {
         <Stack.Screen name="ProduktuKurimoLangas" component={AddProductScreen}/>
         <Stack.Screen name="ProduktuRedagavimoLangas" component={EditProductScreen}/>
       </Stack.Navigator>
+      <NavigationBar />
     </NavigationContainer>
   );
+}
+
+function NavigationBar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [username, setUsername] = useState("")
+  const [count, setCount] = useState(0)
+  const navigation = useNavigation()
+  function getLoggedInUser() {
+    AsyncStorage.getItem("@userData").then(res => {
+      if (res) {
+        const parsedRes = JSON.parse(res)
+        if (parsedRes.hasOwnProperty("username")) {
+          setIsLoggedIn(true)
+          setUsername(parsedRes.username)
+        }
+      }
+    })
+  }
+  useEffect(() => {
+    getLoggedInUser()
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('state', () => {
+      getLoggedInUser()
+      setCount((prevCount => prevCount + 1))
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+  return (count > 1 ? <View style={{width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, padding: 5, paddingHorizontal: 50}}>
+    <TouchableOpacity style={{alignItems: "center"}} onPress={() => navigation.navigate("Klausimynas")}>
+      <Image style={{width: 40, height: 40}} source={require("./assets/browse.png")} />
+      <Text style={{textAlign: "center"}}>Naršyti</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={{alignItems: "center"}} onPress={isLoggedIn ? () => navigation.navigate("Profilis") : () => navigation.navigate("RegistracijaPrisijungimas")}>
+      <Image style={{width: 40, height: 40}} source={require('./assets/profile.png')}/>
+      <Text style={{textAlign: "center"}}>{isLoggedIn ? username : "Prisijungimas"}</Text>
+    </TouchableOpacity>
+  </View> : null)
 }
  
 export default App;
