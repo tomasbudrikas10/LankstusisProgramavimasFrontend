@@ -18,7 +18,7 @@ import React, {useState, useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
- 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
  
 function HomeScreen({ navigation }) {
@@ -361,6 +361,8 @@ function RegisterOrLogin({ navigation }) {
   const [registerConfirmPasswordValue, setRegisterConfirmPasswordValue] = useState("")
   const [registerErrors, setRegisterErrors] = useState([])
   const [registerResult, setRegisterResult] = useState("")
+  const [loginErrors, setLoginErrors] = useState([])
+  const [loginResult, setLoginResult] = useState("")
   function handleRegisterSubmit() {
     let errors = []
     if (dropdownValue === null) {
@@ -410,8 +412,52 @@ function RegisterOrLogin({ navigation }) {
     }
   }
   function handleLoginSubmit() {
-    console.log(loginNameValue)
-    console.log(loginPasswordValue)
+    let errors = []
+    if (loginNameValue.trim() === "") {
+      errors.push("Įveskitę vartotojo vardą")
+    }
+    if (loginPasswordValue.trim() === "") {
+      errors.push("Įveskite slaptažodį")
+    }
+    setLoginErrors(errors.map((err, index) => {return {
+      id: index,
+      text: err
+    }}))
+    setRegisterResult("")
+    if (errors.length === 0) {
+      fetch("http://tomasbudrikas10.eu.pythonanywhere.com/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "name": loginNameValue,
+          "password": loginPasswordValue
+        }),
+      })
+          .then(result => result.json())
+          .then(json => {
+            if (json.hasOwnProperty("errors")) {
+              setLoginErrors(json.errors.map((error, index) => {
+                return {id: index, text: error}
+              }))
+            }
+            if (json.hasOwnProperty("message")) {
+              setLoginResult(json.message)
+              if (json.hasOwnProperty("data")) {
+                try {
+                  AsyncStorage.setItem("@userData", JSON.stringify(json.data))
+                } catch (e) {
+                  console.error(e)
+                }
+              }
+            } else {
+              setLoginResult("Nepavyko prisijungti.")
+            }
+          })
+          .catch(error => console.error(error))
+    }
   }
   return (
       <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
@@ -433,7 +479,7 @@ function RegisterOrLogin({ navigation }) {
                             <Text style={{color: "red"}}>{"* " + item.text}</Text>
                       )}
                       }
-                      style={{gap: 10}}
+                      style={{flexGrow: 0}}
                       keyExtractor={(item, index) => index.toString()}
                   />)
                 }
@@ -474,6 +520,21 @@ function RegisterOrLogin({ navigation }) {
               </TouchableOpacity>
               <Text style={styles.title}>Prisijungimas</Text>
               <View style={styles.registerLoginForm}>
+                {loginErrors.length > 0 && (
+                    <FlatList
+                        data={loginErrors}
+                        renderItem={({ item }) => {
+                          return (
+                              <Text style={{color: "red"}}>{"* " + item.text}</Text>
+                          )}
+                        }
+                        style={{flexGrow: 0}}
+                        keyExtractor={(item, index) => index.toString()}
+                    />)
+                }
+                {loginResult !== "" && (
+                    <Text>{loginResult}</Text>
+                )}
                 <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę vartotojo vardą"} value={loginNameValue} onChangeText={setLoginNameValue}/>
                 <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę slaptažodį"} value={loginPasswordValue} onChangeText={setLoginPasswordValue} secureTextEntry={true}/>
                 <TouchableOpacity style={{...styles.registerOrLoginButton, width: '100%'}} onPress={handleLoginSubmit}>
