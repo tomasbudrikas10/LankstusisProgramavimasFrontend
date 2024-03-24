@@ -558,9 +558,20 @@ function ProfileScreen({navigation}) {
       console.error(e)
     }
   }, [])
+  function logout() {
+    try {
+      AsyncStorage.removeItem("@userData")
+      navigation.navigate("RegistracijaPrisijungimas")
+    } catch(e) {
+      console.error(e)
+    }
+  }
   return <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}><View style={styles.container}>
     <Text style={{color: "white"}}>Hello, {username}</Text>
     <Text style={{color: "white"}}>Role: {role}</Text>
+    <TouchableOpacity style={{...styles.registerOrLoginButton, marginTop: "auto"}} onPress={logout}>
+      <Text style={styles.registerOrLoginButtonText}>Atsijungti</Text>
+    </TouchableOpacity>
     {role === "user" ? <Text>Neturite prieigos.</Text> : <TouchableOpacity style={{...styles.registerOrLoginButton}} onPress={() => navigation.navigate('ProduktuCRUDLangas')}>
       <Text style={styles.registerOrLoginButtonText}>Redaguoti Produktus</Text>
     </TouchableOpacity>}
@@ -903,6 +914,9 @@ function NavigationBar() {
           setIsLoggedIn(true)
           setUsername(parsedRes.username)
         }
+      } else {
+        setIsLoggedIn(false)
+        setUsername("")
       }
     })
   }
