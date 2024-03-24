@@ -1,10 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, Modal, StyleSheet, Text, View, Pressable, TouchableWithoutFeedback, ImageBackground, Image, TouchableOpacity, TextInput } from 'react-native';
+import {
+  Button,
+  ScrollView,
+  Modal,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TouchableWithoutFeedback,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  FlatList
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer, useFocusEffect, useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
- 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
  
 function HomeScreen({ navigation }) {
@@ -335,21 +349,599 @@ function FeedbackScreen({ navigation }) {
     </ImageBackground>
 );
 }
- 
+
+function RegisterOrLogin({ navigation }) {
+  const [isOnRegisterScreen, setIsOnRegisterScreen] = useState(true)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [dropdownValue, setDropdownValue] = useState(null)
+  const [loginNameValue, setLoginNameValue] = useState("")
+  const [loginPasswordValue, setLoginPasswordValue] = useState("")
+  const [registerNameValue, setRegisterNameValue] = useState("")
+  const [registerPasswordValue, setRegisterPasswordValue] = useState("")
+  const [registerConfirmPasswordValue, setRegisterConfirmPasswordValue] = useState("")
+  const [registerErrors, setRegisterErrors] = useState([])
+  const [registerResult, setRegisterResult] = useState("")
+  const [loginErrors, setLoginErrors] = useState([])
+  const [loginResult, setLoginResult] = useState("")
+  function handleRegisterSubmit() {
+    let errors = []
+    if (dropdownValue === null) {
+      errors.push("Pasirinkite paskyros tipą")
+    }
+    if (registerNameValue.trim() === "") {
+      errors.push("Įveskitę vartotojo vardą")
+    }
+    if (registerPasswordValue.trim() === "") {
+      errors.push("Įveskite slaptažodį")
+    }
+    if (registerConfirmPasswordValue.trim() !== registerPasswordValue.trim()) {
+      errors.push("Slaptažodžiai nesutampa")
+    }
+    setRegisterErrors(errors.map((err, index) => {return {
+      id: index,
+      text: err
+    }}))
+    setRegisterResult("")
+    if (errors.length === 0) {
+      fetch("http://tomasbudrikas10.eu.pythonanywhere.com/users/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "name": registerNameValue,
+          "password": registerPasswordValue,
+          "role": dropdownValue
+        }),
+      })
+          .then(result => result.json())
+          .then(json => {
+            if (json.hasOwnProperty("errors")) {
+              setRegisterErrors(json.errors.map((error, index) => {
+                return {id: index, text: error}
+              }))
+            }
+            if (json.hasOwnProperty("message")) {
+              setRegisterResult(json.message)
+            } else {
+              setRegisterResult("Nepavyko prisiregistruoti.")
+            }
+          })
+          .catch(error => console.error(error))
+    }
+  }
+  function handleLoginSubmit() {
+    let errors = []
+    if (loginNameValue.trim() === "") {
+      errors.push("Įveskitę vartotojo vardą")
+    }
+    if (loginPasswordValue.trim() === "") {
+      errors.push("Įveskite slaptažodį")
+    }
+    setLoginErrors(errors.map((err, index) => {return {
+      id: index,
+      text: err
+    }}))
+    setRegisterResult("")
+    if (errors.length === 0) {
+      fetch("http://tomasbudrikas10.eu.pythonanywhere.com/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "name": loginNameValue,
+          "password": loginPasswordValue
+        }),
+      })
+          .then(result => result.json())
+          .then(json => {
+            if (json.hasOwnProperty("errors")) {
+              setLoginErrors(json.errors.map((error, index) => {
+                return {id: index, text: error}
+              }))
+            }
+            if (json.hasOwnProperty("message")) {
+              setLoginResult(json.message)
+              if (json.hasOwnProperty("data")) {
+                try {
+                  AsyncStorage.setItem("@userData", JSON.stringify(json.data))
+                  navigation.navigate('Profilis')
+                } catch (e) {
+                  console.error(e)
+                }
+              }
+            } else {
+              setLoginResult("Nepavyko prisijungti.")
+            }
+          })
+          .catch(error => console.error(error))
+    }
+  }
+  return (
+      <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+        { isOnRegisterScreen ?
+            (<View style={styles.container}>
+              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(false)}>
+                <Text style={styles.registerOrLoginButtonText}>Eiti Į Prisijungimo Langą</Text>
+              </TouchableOpacity>
+                <Text style={styles.title}>Registracija</Text>
+                <View style={styles.registerLoginForm}>
+                {registerErrors.length > 0 && (
+                  <FlatList
+                      data={registerErrors}
+                      renderItem={({ item }) => {
+                        return (
+                            <Text style={{color: "red"}}>{"* " + item.text}</Text>
+                      )}
+                      }
+                      style={{flexGrow: 0}}
+                      keyExtractor={(item, index) => index.toString()}
+                  />)
+                }
+                  {registerResult !== "" && (
+                      <Text>{registerResult}</Text>
+                  )}
+                  <DropDownPicker
+                      items={[
+                          {label: "Vartotojas", value: "user"},
+                          {label: "Administratorius", value: "admin"},
+                          {label: "Įmonė", value: "company"},
+                      ]}
+                      value={dropdownValue}
+                      setValue={setDropdownValue}
+                      open={isDropdownOpen}
+                      setOpen={setIsDropdownOpen}
+                      placeholder='Pasirinkite paskyros tipą'
+                      dropDownDirection="BOTTOM"
+                      multiple={false}
+                      maxHeight={200}
+                      textStyle={{fontSize: 17, color: 'black'}}
+                      placeholderStyle={{fontWeight: 'bold'}}
+                  />
+                  <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę vartotojo vardą"} value={registerNameValue} onChangeText={setRegisterNameValue}/>
+                  <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę slaptažodį"} value={registerPasswordValue} onChangeText={setRegisterPasswordValue} secureTextEntry={true}/>
+                  <TextInput style={styles.registerLoginInput} placeholder={"Patvirtinkite slaptažodį"} value={registerConfirmPasswordValue} onChangeText={setRegisterConfirmPasswordValue} secureTextEntry={true}/>
+                  <TouchableOpacity style={{...styles.registerOrLoginButton, width: '100%'}} onPress={handleRegisterSubmit}>
+                    <Text style={styles.registerOrLoginButtonText}>Prisiregistruoti</Text>
+                  </TouchableOpacity>
+                </View>
+            </View>) :
+            (<View style={styles.container}>
+              <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => setIsOnRegisterScreen(true)}>
+                <Text style={styles.registerOrLoginButtonText}>Eiti Į Registracijos Langą</Text>
+              </TouchableOpacity>
+              <Text style={styles.title}>Prisijungimas</Text>
+              <View style={styles.registerLoginForm}>
+                {loginErrors.length > 0 && (
+                    <FlatList
+                        data={loginErrors}
+                        renderItem={({ item }) => {
+                          return (
+                              <Text style={{color: "red"}}>{"* " + item.text}</Text>
+                          )}
+                        }
+                        style={{flexGrow: 0}}
+                        keyExtractor={(item, index) => index.toString()}
+                    />)
+                }
+                {loginResult !== "" && (
+                    <Text>{loginResult}</Text>
+                )}
+                <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę vartotojo vardą"} value={loginNameValue} onChangeText={setLoginNameValue}/>
+                <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę slaptažodį"} value={loginPasswordValue} onChangeText={setLoginPasswordValue} secureTextEntry={true}/>
+                <TouchableOpacity style={{...styles.registerOrLoginButton, width: '100%'}} onPress={handleLoginSubmit}>
+                  <Text style={styles.registerOrLoginButtonText}>Prisijungti</Text>
+                </TouchableOpacity>
+              </View>
+            </View>)
+        }
+      </ImageBackground>
+  )
+}
+
+function ProfileScreen({navigation}) {
+  const [username, setUsername] = useState("")
+  const [role, setRole] = useState("")
+  useEffect(() => {
+    try {
+      AsyncStorage.getItem("@userData").then((result) => {
+        if (result) {
+          const parsedResult = JSON.parse(result)
+          setUsername(parsedResult.username)
+          setRole(parsedResult.role)
+        }
+      })
+    } catch(e) {
+      console.error(e)
+    }
+  }, [])
+  function logout() {
+    try {
+      AsyncStorage.removeItem("@userData")
+      navigation.navigate("RegistracijaPrisijungimas")
+    } catch(e) {
+      console.error(e)
+    }
+  }
+  return <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}><View style={styles.container}>
+    <Text style={{color: "white"}}>Hello, {username}</Text>
+    <Text style={{color: "white"}}>Role: {role}</Text>
+    <TouchableOpacity style={{...styles.registerOrLoginButton, marginTop: "auto"}} onPress={logout}>
+      <Text style={styles.registerOrLoginButtonText}>Atsijungti</Text>
+    </TouchableOpacity>
+    {role === "user" ? <Text>Neturite prieigos.</Text> : <TouchableOpacity style={{...styles.registerOrLoginButton}} onPress={() => navigation.navigate('ProduktuCRUDLangas')}>
+      <Text style={styles.registerOrLoginButtonText}>Redaguoti Produktus</Text>
+    </TouchableOpacity>}
+  </View></ImageBackground>
+}
+
+function ProductCRUDScreen({navigation}) {
+  const [userId, setUserId] = useState("")
+  const [username, setUsername] = useState("")
+  const [role, setRole] = useState("")
+  const [userProducts, setUserProducts] = useState([])
+  const [randomValue, setRandomValue] = useState(0)
+  function getUserData() {
+    try {
+      AsyncStorage.getItem("@userData").then((result) => {
+        if (result) {
+          const parsedResult = JSON.parse(result)
+          setUserId(parsedResult.id)
+          setUsername(parsedResult.username)
+          setRole(parsedResult.role)
+        }
+      })
+    } catch(e) {
+      console.error(e)
+    }
+  }
+
+  function getUserProducts() {
+    fetch("http://tomasbudrikas10.eu.pythonanywhere.com/products")
+        .then(res => res.json())
+        .then(json => {
+          if (role === "admin") {
+            setUserProducts(json.data)
+          } else {
+            setUserProducts(json.data.filter((product) => product.vartotojoId === userId))
+          }
+        })
+  }
+
+  useEffect(() => {
+    getUserData()
+  }, [])
+  useEffect(() => {
+    getUserProducts()
+  }, [randomValue]);
+  useEffect(() => {
+    getUserProducts()
+  }, [role, userId])
+  useFocusEffect(
+      React.useCallback(() => {
+        refreshProducts()
+      }, [])
+  );
+
+  function refreshProducts() {
+    setRandomValue(Math.random())
+  }
+
+  function deleteProduct(productId) {
+    fetch("http://tomasbudrikas10.eu.pythonanywhere.com/products/" + productId, {
+      method: "DELETE"
+    }).then(() => refreshProducts())
+  }
+  return <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
+    <View style={{...styles.container, padding: 25}}>
+    <Text style={{fontSize: 20, fontWeight: "bold", color: "white"}}>"{username}" produktų redagavimas</Text>
+    <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => navigation.navigate("ProduktuKurimoLangas")}>
+      <Text style={styles.registerOrLoginButtonText}>Pridėti naują produktą</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.registerOrLoginButton} onPress={() => refreshProducts()}>
+      <Text style={styles.registerOrLoginButtonText}>Atnaujinti produktus</Text>
+    </TouchableOpacity>
+    {userProducts.map((product) => <View key={product.id} style={{flex: 0, width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+      <Text style={{fontSize: 16, fontWeight: "bold", color: "white"}}>{product.pavadinimas}</Text>
+      <View style={{flex: 0, flexDirection: "row", gap: 5}}>
+        <TouchableOpacity style={{...styles.registerOrLoginButton, width: 70}}>
+          <Text style={styles.registerOrLoginButtonText} onPress={() => navigation.navigate("ProduktuRedagavimoLangas", {product:product})}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{...styles.registerOrLoginButton, width: 70}} onPress={() => deleteProduct(product.id)}>
+          <Text style={styles.registerOrLoginButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </View>)}
+  </View>
+  </ImageBackground>
+}
+
+function AddProductScreen({navigation}) {
+  const [productNameValue, setProductNameValue] = useState("")
+  const [productDescriptionValue, setProductDescriptionValue] = useState("")
+  const [productImageUrlValue, setProductImageUrlValue] = useState("")
+  const [productManufacturerValue, setProductManufacturerValue] = useState("")
+  const [productProductPageValue, setProductPageValue] = useState("")
+  const [productErrors, setProductErrors] = useState([])
+  const [productResult, setProductResult] = useState("")
+  const [userId, setUserId] = useState("")
+  useEffect(() => {
+    function getUserData() {
+      try {
+        AsyncStorage.getItem("@userData").then((result) => {
+          if (result) {
+            const parsedResult = JSON.parse(result)
+            setUserId(parsedResult.id)
+          }
+        })
+      } catch(e) {
+        console.error(e)
+      }
+    }
+    getUserData()
+  }, []);
+
+  function submitProduct() {
+    let errors = []
+    if (productNameValue.trim() === "") {
+      errors.push("Trūksta produkto pavadinimo")
+    }
+    if (productDescriptionValue.trim() === "") {
+      errors.push("Trūksta produkto aprašymo")
+    }
+    if (productImageUrlValue.trim() === "") {
+      errors.push("Trūksta produkto paveiksliuko nuorodos")
+    }
+    if (productManufacturerValue.trim() === "") {
+      errors.push("Trūksta produkto gamintojo")
+    }
+    if (productProductPageValue.trim() === "") {
+      errors.push("Trūksta produkto puslapio nuorodos")
+    }
+    setProductErrors(errors.map((err, index) => {return {
+      id: index,
+      text: err
+    }}))
+    setProductResult("")
+    if (errors.length === 0) {
+      fetch("http://tomasbudrikas10.eu.pythonanywhere.com/products/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "name": productNameValue,
+          "description": productDescriptionValue,
+          "image_url": productImageUrlValue,
+          "manufacturer": productManufacturerValue,
+          "product_url": productProductPageValue,
+          "user_id": userId
+        }),
+      })
+          .then(result => result.json())
+          .then(json => {
+            if (json.hasOwnProperty("errors")) {
+              setProductErrors(json.errors.map((error, index) => {
+                return {id: index, text: error}
+              }))
+            } else {
+              setTimeout(() => navigation.navigate("ProduktuCRUDLangas"), 2000)
+            }
+            if (json.hasOwnProperty("message")) {
+              setProductResult(json.message)
+            } else {
+              setProductResult("Nepavyko sukurti produkto.")
+            }
+          })
+          .catch(error => console.error(error))
+    }
+  }
+  return <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}><View style={{...styles.container, padding: 10}}>
+    <Text style={{fontSize: 30, fontWeight: "bold", color: "white"}}>Produkto kūrimas</Text>
+    <View style={styles.registerLoginForm}>
+    {productErrors.length > 0 && (
+        <FlatList
+            data={productErrors}
+            renderItem={({ item }) => {
+              return (
+                  <Text style={{color: "red"}}>{"* " + item.text}</Text>
+              )}
+            }
+            style={{flexGrow: 0}}
+            keyExtractor={(item, index) => index.toString()}
+        />)
+    }
+    {productResult !== "" && (
+        <Text>{productResult}</Text>
+    )}
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto pavadinimą"} value={productNameValue} onChangeText={setProductNameValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto aprašymą"} value={productDescriptionValue} onChangeText={setProductDescriptionValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto nuotraukos nuorodą"} value={productImageUrlValue} onChangeText={setProductImageUrlValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto gamintoją"} value={productManufacturerValue} onChangeText={setProductManufacturerValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto puslapio nuorodą"} value={productProductPageValue} onChangeText={setProductPageValue}/>
+      <TouchableOpacity style={{...styles.registerOrLoginButton, width: "100%"}} onPress={submitProduct}>
+        <Text style={styles.registerOrLoginButtonText}>Sukurti produktą</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+  </ImageBackground>
+}
+
+function EditProductScreen({route, navigation}) {
+  const [productId, setProductId] = useState(0)
+  const [productNameValue, setProductNameValue] = useState({})
+  const [productDescriptionValue, setProductDescriptionValue] = useState({})
+  const [productImageUrlValue, setProductImageUrlValue] = useState({})
+  const [productManufacturerValue, setProductManufacturerValue] = useState({})
+  const [productProductPageValue, setProductPageValue] = useState({})
+  const [productErrors, setProductErrors] = useState([])
+  const [productResult, setProductResult] = useState("")
+  const [userId, setUserId] = useState(0)
+  useFocusEffect(
+      React.useCallback(() => {
+        setProductId(route.params.product.id)
+        setProductNameValue(route.params.product.pavadinimas)
+        setProductDescriptionValue(route.params.product.aprasymas)
+        setProductImageUrlValue(route.params.product.paveiksliukas)
+        setProductManufacturerValue(route.params.product.gamintojas)
+        setProductPageValue(route.params.product.produkto_puslapis)
+        setUserId(route.params.product.vartotojoId)
+      }, [])
+  );
+  function updateProduct() {
+    let errors = []
+    if (productNameValue.trim() === "") {
+      errors.push("Trūksta produkto pavadinimo")
+    }
+    if (productDescriptionValue.trim() === "") {
+      errors.push("Trūksta produkto aprašymo")
+    }
+    if (productImageUrlValue.trim() === "") {
+      errors.push("Trūksta produkto paveiksliuko nuorodos")
+    }
+    if (productManufacturerValue.trim() === "") {
+      errors.push("Trūksta produkto gamintojo")
+    }
+    if (productProductPageValue.trim() === "") {
+      errors.push("Trūksta produkto puslapio nuorodos")
+    }
+    setProductErrors(errors.map((err, index) => {return {
+      id: index,
+      text: err
+    }}))
+    setProductResult("")
+    if (errors.length === 0) {
+      fetch("http://tomasbudrikas10.eu.pythonanywhere.com/products/" + productId, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "name": productNameValue,
+          "description": productDescriptionValue,
+          "image_url": productImageUrlValue,
+          "manufacturer": productManufacturerValue,
+          "product_url": productProductPageValue,
+          "user_id": userId
+        }),
+      })
+          .then(result => result.json())
+          .then(json => {
+            if (json.hasOwnProperty("errors")) {
+              setProductErrors(json.errors.map((error, index) => {
+                return {id: index, text: error}
+              }))
+            } else {
+              setTimeout(() => navigation.navigate("ProduktuCRUDLangas"), 2000)
+            }
+            if (json.hasOwnProperty("message")) {
+              setProductResult(json.message)
+            } else {
+              setProductResult("Nepavyko atnaujinti produkto.")
+            }
+          })
+          .catch(error => console.error(error))
+    }
+  }
+  return <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}><View style={{...styles.container, padding: 10}}>
+    <Text style={{fontSize: 20, fontWeight: "bold", color: "white"}}>{route.params.product.pavadinimas} redagavimas</Text>
+    <View style={styles.registerLoginForm}>
+      {productErrors.length > 0 && (
+          <FlatList
+              data={productErrors}
+              renderItem={({ item }) => {
+                return (
+                    <Text style={{color: "red"}}>{"* " + item.text}</Text>
+                )}
+              }
+              style={{flexGrow: 0}}
+              keyExtractor={(item, index) => index.toString()}
+          />)
+      }
+      {productResult !== "" && (
+          <Text>{productResult}</Text>
+      )}
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto pavadinimą"} value={productNameValue} onChangeText={setProductNameValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto aprašymą"} value={productDescriptionValue} onChangeText={setProductDescriptionValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto nuotraukos nuorodą"} value={productImageUrlValue} onChangeText={setProductImageUrlValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto gamintoją"} value={productManufacturerValue} onChangeText={setProductManufacturerValue}/>
+      <TextInput style={styles.registerLoginInput} placeholder={"Įveskitę produkto puslapio nuorodą"} value={productProductPageValue} onChangeText={setProductPageValue}/>
+      <TouchableOpacity style={{...styles.registerOrLoginButton, width: "100%"}} onPress={updateProduct}>
+        <Text style={styles.registerOrLoginButtonText}>Atnaujinti produktą</Text>
+      </TouchableOpacity>
+    </View>
+  </View></ImageBackground>
+}
  
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Sveiki">
+      <Stack.Navigator initialRouteName="Sveiki" screenOptions={{
+        header: () => null
+      }}>
         <Stack.Screen name="Sveiki" component={HomeScreen}/>
         <Stack.Screen name="Klausimynas" component={QuizScreen}/>
         <Stack.Screen name="Sąrašas" component={ItemListScreen}/>
         <Stack.Screen name="Produktas" component={ProductInfoScreen}/>
         <Stack.Screen name="Pagalba" component={HelpScreen}/>
         <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
+        <Stack.Screen name="RegistracijaPrisijungimas" component={RegisterOrLogin}/>
+        <Stack.Screen name="Profilis" component={ProfileScreen}/>
+        <Stack.Screen name="ProduktuCRUDLangas" component={ProductCRUDScreen}/>
+        <Stack.Screen name="ProduktuKurimoLangas" component={AddProductScreen}/>
+        <Stack.Screen name="ProduktuRedagavimoLangas" component={EditProductScreen}/>
       </Stack.Navigator>
+      <NavigationBar />
     </NavigationContainer>
   );
+}
+
+function NavigationBar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [username, setUsername] = useState("")
+  const [count, setCount] = useState(0)
+  const navigation = useNavigation()
+  function getLoggedInUser() {
+    AsyncStorage.getItem("@userData").then(res => {
+      if (res) {
+        const parsedRes = JSON.parse(res)
+        if (parsedRes.hasOwnProperty("username")) {
+          setIsLoggedIn(true)
+          setUsername(parsedRes.username)
+        }
+      } else {
+        setIsLoggedIn(false)
+        setUsername("")
+      }
+    })
+  }
+  useEffect(() => {
+    getLoggedInUser()
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('state', () => {
+      getLoggedInUser()
+      setCount((prevCount => prevCount + 1))
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+  return (count > 1 ? <View style={{width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, padding: 5, paddingHorizontal: 50}}>
+    <TouchableOpacity style={{alignItems: "center"}} onPress={() => navigation.navigate("Klausimynas")}>
+      <Image style={{width: 40, height: 40}} source={require("./assets/browse.png")} />
+      <Text style={{textAlign: "center"}}>Naršyti</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={{alignItems: "center"}} onPress={isLoggedIn ? () => navigation.navigate("Profilis") : () => navigation.navigate("RegistracijaPrisijungimas")}>
+      <Image style={{width: 40, height: 40}} source={require('./assets/profile.png')}/>
+      <Text style={{textAlign: "center"}}>{isLoggedIn ? username : "Prisijungimas"}</Text>
+    </TouchableOpacity>
+  </View> : null)
 }
  
 export default App;
@@ -359,6 +951,36 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     marginTop: 15,
+  },
+  registerOrLoginButton: {
+    backgroundColor: 'rgb(51, 153, 255)',
+    marginTop: 10,
+    fontWeight: 'bold',
+    width: '90%',
+    padding: 5,
+    borderRadius: 10,
+  },
+  registerOrLoginButtonText: {
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 20,
+  },
+  registerLoginInput: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    textAlign: "center",
+    padding: 5,
+  },
+  registerLoginInputLabel: {
+    textAlign: "center",
+  },
+  registerLoginForm: {
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 25,
+    padding: 50,
+    marginTop: 20,
+    width: '90%',
+    gap: 25
   },
   modalText: {
     fontSize: 17,
