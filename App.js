@@ -448,6 +448,7 @@ function RegisterOrLogin({ navigation }) {
               if (json.hasOwnProperty("data")) {
                 try {
                   AsyncStorage.setItem("@userData", JSON.stringify(json.data))
+                  navigation.navigate('Profilis')
                 } catch (e) {
                   console.error(e)
                 }
@@ -546,6 +547,25 @@ function RegisterOrLogin({ navigation }) {
       </ImageBackground>
   )
 }
+
+function ProfileScreen({navigation}) {
+  const [username, setUsername] = useState("")
+  useEffect(() => {
+    try {
+      AsyncStorage.getItem("@userData").then((result) => {
+        if (result) {
+          const parsedResult = JSON.parse(result)
+          setUsername(parsedResult.username)
+        }
+      })
+    } catch(e) {
+      console.error(e)
+    }
+  }, [])
+  return <View style={styles.container}>
+    <Text>Hello, {username}</Text>
+  </View>
+}
  
 function App() {
   return (
@@ -558,6 +578,7 @@ function App() {
         <Stack.Screen name="Pagalba" component={HelpScreen}/>
         <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
         <Stack.Screen name="RegistracijaPrisijungimas" component={RegisterOrLogin}/>
+        <Stack.Screen name="Profilis" component={ProfileScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
