@@ -1,45 +1,88 @@
 const translations = {
   lt: {
     // Lietuvių kalbos vertimai
+    Welcome: 'Sveiki',
+    program: 'Produktų Informacijos Gavimo Programa',
     help: 'Pagalba',
     continue: 'Tęsti',
     category: 'Kategorija',
-    title1: 'Kam reikalinga ši programa?',
-    desc1: 'Ši programa leidžia vartotojui surasti jam tinkamą išmaniūjų namų sistemą.....',
+    Title1: 'Kam reikalinga ši programa?',
+    desc1: 'Ši programa leidžia vartotojui surasti jam tinkamą išmaniųjų namų sistemą.....',
     title2: 'Kaip naudotis programa?',
-    desc2: '1. Pradinio lango apačioje matomas mygtukas `tęsti`, kurį paspaudus jūs busite nuvedamas į klausimyną.',
-    desc3: '2. Klausimyno lange jums reikia pasirinkti kūrią kategoriją norite pasirinkti.',
-    desc4: '3. Pasirinkę kategoriją ir paspaudę mygtuką tęsti, jums bus rodoma produkto išsami informacija.',
-    desc5: '4. Viršui kairėje paspaudūs mygtuką su atbuline rodykle, jūs būsite gražinamas į praeitą langą.',
-    title3: 'Kas dare šią programą?',
-    desc6: 'Šia programą darė keturi Klaipėdos valstybinės kolegijos antro kurso informatikos studentai, kurie turėjo savo pareigas ir atsakomybes:',
-    desc7: 'Karolis Kleinauskas - Duomenų bazės '
-
-
-
-    
+    desc2: '1. Pradinio lango apačioje matomas mygtukas `Tęsti`, kurį paspaudus jūs busite nuvedamas į klausimyną.',
+    desc3: '2. Klausimyno lange jums reikia pasirinkti kurią kategoriją norite pasirinkti.',
+    desc4: '3. Pasirinkę kategoriją ir paspaudę mygtuką `Tęsti`, jums bus rodoma produkto išsami informacija.',
+    desc5: '4. Viršuje kairėje paspaudus mygtuką su atbuline rodykle, jūs būsite gražinamas į praeitą langą.',
+    title3: 'Kas darė šią programą?',
+    desc6: 'Šią programą sukūrė keturi Klaipėdos valstybinės kolegijos antro kurso informatikos studentai, kurie turėjo savo pareigas ir atsakomybes:',
+    desc7: 'Karolis Kleinauskas - Duomenų bazės ',
+    // Klausimynas
+    Questionnaire: 'Klausimynas',
+    category1: 'Kategorija: pirma',
+    category2: 'Kategorija: Antra',
+    category: 'Kategorija',
+    Product: 'Produktas',
+    Products: 'Produktai',
+    Categories: 'Kategorijos',
+    Product1: 'Produkto pavadinimas',
+    Product2: 'Produkto informacija',
+    Reviews: 'Atsiliepimai',
+    Reviews2: 'Įvertinkite savo patirtį',
+    Reviews3: 'Padėkite mums tobulėti',
+    Send: 'Siųsti',
+    Thanks: 'Ačiū už atsiliepimą!',
+    // Prisijungimas
+    back: 'Grįžti atgal',
+    go: 'Eiti į prisijungimo langą',
+    registration: 'Registracija',
+    registration2: 'Prisiregistruoti',
+    go2: 'Eiti į registracijos langą',
+    login: 'Prisijungimas',
+    login2: 'Prisijungti',
   },
   en: {
-    // Anglų kalbos vertimai
+    // English translations
+    Welcome: 'Welcome',
+    program: 'Product Information Retrieval Program',
     help: 'Help',
     continue: 'Continue',
     category: 'Category',
     Title1: 'Who needs this program?',
-    desc1: 'This application allows the user to find the right smart home system for him.....',
+    desc1: 'This program allows the user to find a suitable smart home system.....',
     title2: 'How to use the program?',
-    desc2: '1. At the bottom of the initial window, you can see the CONTINUE button, which will take you to the questionnaire.',
-    desc3: '2. Klausimyno lange jums reikia pasirinkti kūrią kategoriją norite pasirinkti.',
-    desc4: '2. In the questionnaire window you need to choose which category you want to choose.',
-    desc5: '4. If you press the button with the back arrow on the top left, you will be returned to the previous window.',
-    title3: 'Who makes this program?',
-    desc6: 'This program was made by four second-year informatics students of Klaipėda State College, who had their own duties and responsibilities:',
-    desc7: 'Karolis Kleinauskas - Databases '
-
-
-    
-  }
+    desc2: '1. At the bottom of the initial window, there is a button `Continue`, which when clicked will take you to the questionnaire.',
+    desc3: '2. In the questionnaire window, you need to choose which category you want to select.',
+    desc4: '3. After selecting the category and clicking the `Continue` button, you will be shown detailed product information.',
+    desc5: '4. By clicking the button with the back arrow at the top left, you will be returned to the previous window.',
+    title3: 'Who made this program?',
+    desc6: 'This program was made by four second-year computer science students from Klaipėda State College, who had their own duties and responsibilities:',
+    desc7: 'Karolis Kleinauskas - Database',
+    // Questionnaire
+    Questionaire: 'Questionnaire',
+    category1: 'Category: First',
+    category2: 'Category: Second',
+    category: 'Category',
+    Product: 'Product',
+    Products: 'Products',
+    Categories: 'Categories',
+    Product1: 'Product Name',
+    Product2: 'Product Information',
+    Reviews: 'Reviews',
+    Reviews2: 'Rate your experience',
+    Reviews3: 'Help us improve',
+    Send: 'Send',
+    Thanks: 'Thank you for your feedback!',
+    // Login
+    back: 'Back',
+    go: 'Go to Login Page',
+    registration: 'Registration',
+    registration2: 'Register',
+    go2: 'Go to Registration Page',
+    login: 'Login',
+    login2: 'Log in',
+  },
 };
 
 export function translate(key, lang) {
   return translations[lang][key] || key;
-}
+};

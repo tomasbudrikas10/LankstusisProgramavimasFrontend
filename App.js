@@ -36,8 +36,8 @@ function HomeScreen({ navigation, language }) {
           </Pressable>
         </View>
         <View style={styles.titleBlock}>
-          <Text style={styles.title}>Sveiki</Text>
-          <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
+          <Text style={styles.title}>{translate('Welcome',language)}</Text>
+          <Text style={styles.text1}>{translate('program',language)}</Text>
         </View>
         <View style={styles.buttonNext}>
           <Button title={translate('continue', language)} color='#557FD5' onPress={() => navigation.navigate('Klausimynas')}/>
@@ -49,7 +49,7 @@ function HomeScreen({ navigation, language }) {
   );
 }
  
-function QuizScreen({ navigation }) {
+function QuizScreen({ navigation, language }) {
   const [isOpen1, setOpen1] = useState(false);
   const [currentValue1, setCurrentValue1] = useState([]);
   const [isOpen2, setOpen2] = useState(false);
@@ -292,7 +292,7 @@ function HelpScreen({ navigation, language }) {
   );
 }
  
-function FeedbackScreen({ navigation }) {
+function FeedbackScreen({ navigation, language }) {
   const [rating, setRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -356,7 +356,7 @@ function FeedbackScreen({ navigation }) {
 );
 }
 
-function RegisterOrLogin({ navigation }) {
+function RegisterOrLogin({ navigation, language }) {
   const [isOnRegisterScreen, setIsOnRegisterScreen] = useState(true)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [dropdownValue, setDropdownValue] = useState(null)
@@ -415,7 +415,7 @@ function RegisterOrLogin({ navigation }) {
           .catch(error => console.error(error))
     }
   }
-  function handleLoginSubmit() {
+  function handleLoginSubmit({language}) {
     console.log(loginNameValue)
     console.log(loginPasswordValue)
   }
