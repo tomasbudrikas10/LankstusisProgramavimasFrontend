@@ -235,18 +235,40 @@ function ItemListScreen({ route, navigation }) {
     const htmlContent = `
       <html>
         <head>
-          <title>Produktai</title>
+          <title>Produktų sąrašas</title>
+          <style>
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #f2f2f2;
+            }
+          </style>
         </head>
         <body>
-          <h1>Produktai</h1>
-          <ul>
-            ${getValue1.map((category) => `<li>Produktas - Kategorija: ${category}</li>`).join('')}
-            ${getValue2.map((category) => `<li>Produktas - Kategorija: ${category}</li>`).join('')}
-          </ul>
+          <h1>Produktų sąrašas</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Produktai</th>
+                <th>Kategorijos</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${getValue1.map((category) => `<tr><td>Produktas</td><td>${category}</td></tr>`).join('')}
+              ${getValue2.map((category) => `<tr><td>Produktas</td><td>${category}</td></tr>`).join('')}
+            </tbody>
+          </table>
         </body>
       </html>
     `;
-
+  
     try {
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       await Sharing.shareAsync(uri);
