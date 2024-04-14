@@ -30,9 +30,9 @@ function HomeScreen({ navigation }) {
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
-        <View style={styles.titleBlock}>
+        <View style={styles.mainTitleBlock}>
           <Text style={styles.title}>Sveiki!</Text>
-          <Text style={styles.text1}>Produktų Informacijos Gavimo Programa (?)</Text>
+          <Text style={styles.mainText}>Išmaniūjų Namų Sistemos Gavimo Programa</Text>
         </View>
         <View style={styles.buttonNext}>
           <Button title='Tęsti' color='#557FD5' onPress={() => navigation.navigate('Klausimynas')}/>
@@ -48,6 +48,8 @@ function QuizScreen({ navigation }) {
   const [currentValue1, setCurrentValue1] = useState([]);
   const [isOpen2, setOpen2] = useState(false);
   const [currentValue2, setCurrentValue2] = useState([]);
+  const [isOpen3, setOpen3] = useState(false);
+  const [currentValue3, setCurrentValue3] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [lastValue, setLastValue] = useState([]);
   const [allCurrentValues, setAllCurrentValues] = useState([]);
@@ -60,27 +62,51 @@ function QuizScreen({ navigation }) {
  
   const handleDropdown1Open = () => {
     setOpen2(false);
+    setOpen3(false);
   };
- 
   const handleDropdown2Open = () => {
     setOpen1(false);
+    setOpen3(false);
+  };
+  const handleDropdown3Open = () => {
+    setOpen1(false);
+    setOpen2(false);
   };
  
   const itemData = [
     [
-      {label: 'Pirmas', value: 'a1'},
-      {label: 'Antras', value: 'a2'},
-      {label: 'Trečias', value: 'a3'},
-      {label: 'Ketvirtas', value: 'a4'},
-      {label: 'Penktas', value: 'a5'},
-      {label: 'Šeštas', value: 'a6'},
-      {label: 'Septintas', value: 'a7'},
+      {label: 'Apsaugos funkcijos', value: 'a1'},
+      {label: 'Apšvietimo funkcijos', value: 'a2'},
+      {label: 'Būvimo Modeliavimo funkcijos', value: 'a3'},
+      {label: 'Diagramų Sudarymo funkcijos', value: 'a4'},
+      {label: 'Energijos funkcijos', value: 'a5'},
+      {label: 'Galutinio Vartotojo Konfigūravimo funkcijos', value: 'a6'},
+      {label: 'Geotvoros funkcijos', value: 'a7'},
     ],
     [
-      {label: 'Aštuntas', value: 'b1'},
-      {label: 'Devintas', value: 'b2'},
-      {label: 'Dešimtas', value: 'b3'},
+      {label: 'Kameros funkcijos', value: 'b1'},
+      {label: 'Kitų Sistemų Integravimo funkcijos', value: 'b2'},
+      {label: 'Laikmačio Jungiklių funkcijos', value: 'b3'},
+      {label: 'Langinių funkcijos', value: 'b4'},
+      {label: 'Langų ir Durų Stebėjimo funkcijos', value: 'b5'},
+      {label: 'Loginės funkcijos', value: 'b6'},
+      {label: 'Multimedijos funkcijos', value: 'b7'},
+      {label: 'Naršyklės Integravimo funkcijos', value: 'b8'},
+      {label: 'Nemokamos Vizualizacijos funkcijos', value: 'b9'},
+      {label: 'Orų funkcijos', value: 'b10'},
+      {label: 'Oro Kondicionavimo funkcijos', value: 'b11'},
+      {label: 'Pranešimo/Pavojaus Signalo funkcijos', value: 'b12'},
     ],
+    [
+      {label: 'Scenos funkcijos', value: 'c1'},
+      {label: 'Sekų funkcijos', value: 'c2'},
+      {label: 'Stoglangių funkcijos', value: 'c3'},
+      {label: 'Šildymo funkcijos', value: 'c4'},
+      {label: 'Vartotojo Valdymo funkcijos', value: 'c5'},
+      {label: 'Ventiliacijos funkcijos', value: 'c6'},
+      {label: 'Vertės Stebėjimo funkcijos', value: 'c7'},
+      {label: 'Žaliūzių funkcijos', value: 'c8'},
+    ]
   ];
  
   useEffect(() => {
@@ -89,24 +115,42 @@ function QuizScreen({ navigation }) {
  
   const createModalContent = (lastValue) => {
     const modalData = {
-      a1: { title: 'Pirmas!', text: 'Čia bus 0: "Pirmas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
-      a2: { title: 'Antras!', text: 'Čia bus 0: "Antras" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
-      a3: { title: 'Trečias!', text: 'Čia bus 0: "Trečias" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
-      a4: { title: 'Ketvirtas!', text: 'Čia bus 0: "Ketvirtas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
-      a5: { title: 'Penktas!', text: 'Čia bus 0: "Penktas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
-      a6: { title: 'Šeštas!', text: 'Čia bus 0: "Šeštas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
-      a7: { title: 'Septintas!', text: 'Čia bus 0: "Septintas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
-      b1: { title: 'Aštuntas!', text: 'Čia bus 1: "Aštuntas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
-      b2: { title: 'Devintas!', text: 'Čia bus 1: "Devintas" pasirinkimo aprašymas', imageSource: require('./assets/icon.png') },
-      b3: { title: 'Dešimtas!', text: 'Čia bus 1: "Dešimtas" pasirinkimo aprašymas', imageSource: require('./assets/favicon.png') },
+      a1: { title: 'Apsaugos funkcijos', text: 'Leidžia apsaugoti vartotoją ir visus ten gyvenančius nuo visų rūšių išpuolių prieš gyvybės ir turto saugumą.'},
+      a2: { title: 'Apšvietimo funkcijos', text: 'Leidžia sukurti šiltą ir svetingą efektą, arba suteikti funkcinę šviesą atliekant tokias užduotis kaip skaitymas, siuvimas, televizoriaus žiūrėjimas, valgymas ar apsauga.'},
+      a3: { title: 'Būvimo Modeliavimas', text: 'Leidžia imituoti savo buvimą naudodami apšvietimo ir garso sistemą, jei turite prijungtą partnerio garso įrenginį. Taip atrodys, kad esate namuose.'},
+      a4: { title: 'Diagramų Sudarymas', text: 'Leidžia naudoti diagramas užrašams sutrumpinti ir tvarkyti, padeda sekti pokalbius ir dialogus, kuriuose įprastai būtumėte sumišę ir prarastumėte atitinkamą turinį. Sumažina būtino rašymo kiekį.'},
+      a5: { title: 'Energijos funkcijos', text: 'Apima televizoriaus žiūrėjimą, drabužių skalbimą, namų šildymą ir apšvietimą, maudymąsi duše, darbą iš namų nešiojamu ar kompiuteriu, prietaisų valdymą ir maisto gaminimą.'},
+      a6: { title: 'Galutinio Vartotojo Konfigūravimas', text: 'Leidžia vartotojams priskirti telefonus ir katalogų numerius, kurie leidžia skambinti ir bendrauti su kitais sistemos vartotojais, taip pat skambinti į išorinius tinklus.'},
+      a7: { title: 'Geotvoros funkcijos', text: 'Leidžia vartotojams aldyti integruotą namų apšvietimą, durų spynas, termostatus, elektroninius prietaisus ir prietaisus ir kt. Ji taip pat stebi ir valdo namų apsaugos sistemas, įskaitant įsilaužimo signalizaciją, kameras ir priešgaisrinius bei gyvybės saugos įrenginius.'},
+      
+      b1: { title: 'Kameros funkcijos', text: 'Vaizdo įrašymo įrenginys, fiksuojantis jūsų namų ir nuosavybės filmuotą medžiagą, kurią galite peržiūrėti išmaniajame telefone, planšetiniame kompiuteryje ar kompiuteryje iš bet kurios vietos naudodami interneto ryšį.'},
+      b2: { title: 'Kitų Sistemų Integravimas', text: 'Suteikia galimybė sujungti kelias pastato sistemas (tokias kaip apšvietimas, šildymas, telekomunikacijos ir apsaugos kontrolė) į vieną infrastruktūrą, kuri suteikia didelę naudą ir sutaupo pastatų ir patalpų valdymo, vartotojo išlaidas.'},
+      b3: { title: 'Laikmačio Jungikliai', text: 'Leidžia automatizuoti įvairius elektros prietaisus ar sistemas, leidžiant juos įjungti arba išjungti tam tikru laiku ar intervalais.'},
+      b4: { title: 'Langinės funkcijos', text: 'Leidžia vartotojams reguliuoti langinių padėtį tokiais tikslais kaip šviesos valdymas, privatumas ir energijos vartojimo efektyvumas, todėl patogu pritaikyti namų aplinkai.'},
+      b5: { title: 'Langų ir Durų Stebėjimas', text: 'Suteikia langų ir durų jutiklius, kurie yra nedideli įtaisai, kurie tvirtinami prie jūsų durų ar langų ir gali pranešti, jei kuris nors iš jų atsidaro.'},
+      b6: { title: 'Loginės funkcijos', text: 'Logiškas namas užtikrina efektyvų, patogų ir tvarų gyvenimą per išmaniųjų technologijų integraciją, automatizavimą, energijos vartojimo efektyvumą, apsaugos priemones ir individualizuotą patirtį.'},
+      b7: { title: 'Multimedijos funkcijos', text: 'Apima įvairias medijos elementus, tokių kaip tekstas, vaizdai, garsas, vaizdo įrašai, animacija ir interaktyvumas, derinį, kurie yra integruoti siekiant sukurti patrauklesnę ir interaktyvesnę patirtį vartotojui.'},
+      b8: { title: 'Naršyklės Integravimas', text: 'Leidžia namų savininkams nuotoliniu būdu valdyti ir stebėti įvairius savo namų aspektus per interneto naršykles: išmaniųjų įrenginių valdymą, apšvietimo, temperatūros ir apsaugos sistemų nustatymų reguliavimą, stebėjimo kamerų tiekimą, įspėjimų ir pranešimų gavimą ir užduočių ar rutinų planavimą.'},
+      b9: { title: 'Nemokama Vizualizacija', text: 'Suteikia vartotojui nemokama debesyje priglobta programą, skirta duomenų vizualizavimui ir analizei. Tai komercinės informacijos suvestinės, ataskaitų teikimo ir duomenų maišymo platformos darinys.'},
+      b10: { title: 'Orų funkcijos', text: 'Leidžia geriau prognozuoti orą ir analizuoti atmosferos kokybę namuose. Pateikia duomenis, susijusius su atmosfera namuose, pavyzdžiui, oro kokybe, patalpų oro taršos drėgme ir temperatūra.'},
+      b11: { title: 'Oro Kondicionavimas', text: 'Suteikia šaltą orą jūsų namuose ar uždaroje erdvėje, iš tikrųjų pašalindamas šilumą ir drėgmę iš patalpų oro. Jis grąžina atvėsintą orą į vidaus erdvę, o nepageidaujamą šilumą ir drėgmę perkelia į lauką.'},
+      b12: { title: 'Pranešimo/Pavojaus Signalas', text: 'Suteikia apsaugą nuo įsilaužimo sistemą, kuri susideda iš kelių elektrinių komponentų, kurie yra prijungti prie nekilnojamojo turto. Per jutiklius ir kontaktus jie aptinka judėjimą arba durų ir langų atsidarymą, o tada skleidžiamas garsus aliarmas, perspėjantis šalia esančius apie neteisėtą patekimą.'},
+      
+      c1: { title: 'Scenos funkcijos', text: 'Apima netvarkos pašalinimą, baldų pertvarkymą, dekoro keitimą ir dažų spalvų keitimą, kad namas atrodytų švarus, harmoningas ir patrauklus plačiajai auditorijai.'},
+      c2: { title: 'Sekų funkcijos', text: 'Leidžia automatizuoti sudėtingus apšvietimo scenarijus, pagerinti estetiką ir suteikti patogumo įvairioms veikloms ar nuotaikoms namuose.'},
+      c3: { title: 'Stoglangių funkcijos', text: 'Leidžia vartotojams atidaryti arba uždaryti stoglangius, reguliuoti žaliuzes ir reguliuoti natūralaus apšvietimo lygį.'},
+      c4: { title: 'Šildymo funkcijos', text: 'Leidžia gaminti šiluminę energiją ir perduoti ją orui visame name, ir užtikrina komfortą šaltuoju metų laiku.'},
+      c5: { title: 'Vartotojo Valdymas', text: 'Apima skirtingų vartotojų prieigos, nuostatų ir leidimų valdymą: vartotojų paskyrų nustatymą, privilegijų, tokių kaip išmaniųjų įrenginių valdymas ar prieigos prie saugos funkcijų, suteikimą, svečių prieigos valdymą, vartotojų veiklos stebėjimą ir namų gyventojų saugumo bei privatumo užtikrinimą.'},
+      c6: { title: 'Ventiliacijos funkcijos', text: 'Suteikia patalpų ir lauko oro mainus, ir užtikrina sveiką kvėpuoti orą, praskiedžiant pastate esančius teršalus ir pašalinant iš jo teršalus.'},
+      c7: { title: 'Vertės Stebėjimas', text: 'Leidžia apskaičiuoti savo namo vertę naudodami internetinius įrankius ir apmokytus specialistus, kad geriau pasiruošite pirkti, parduoti, refinansuoti, panaudoti savo būsto nuosavybę ar net derėtis dėl mažesnių nekilnojamojo turto mokesčių.'},
+      c8: { title: 'Žaliūzių funkcijos', text: 'Leidžia naudotojams reguliuoti žaliuzių, užuolaidų padėtį, šviesos valdymo ar energijos vartojimo efektyvumo tikslais, taip užtikrinant patogumą ir pritaikymą namuose.'},
     };
-    const data = modalData[lastValue] || { title: '???', text: 'Nėra tokio pasirinkimo...', imageSource: require('./assets/icon.png') };
+    const data = modalData[lastValue] || { title: '???', text: 'Nėra pasirinkimo aprašymo...'};
  
     return (
       <View>
         <Text style={styles.modalTitle}>{data.title}</Text>
         <Text style={styles.modalText}>{data.text}</Text>
-        <Image source={data.imageSource} style={styles.modalImage} />
       </View>
     );
   };
@@ -121,7 +165,6 @@ function QuizScreen({ navigation }) {
         </View>
         <View style={styles.quizFlex}>
           <Text style={styles.quizTitle}>Klausimynas</Text>
-          <Text style={[styles.quizCategoryTitle, {color: '#BEF5EA'}]}>Kategorija: Pirma</Text>
           <DropDownPicker
             items={itemData[0]}
             value={currentValue1}
@@ -129,7 +172,31 @@ function QuizScreen({ navigation }) {
             open={isOpen1}
             setOpen={() => setOpen1(!isOpen1)}
             onOpen={handleDropdown1Open}
-            placeholder='Kategorija: Pirma'
+            placeholder='Funkcijos: A - I'
+            dropDownDirection="BOTTOM"
+            multiple={true}
+            min={0}
+            max={10}
+            maxHeight={200}
+            showTickIcon={true}
+            theme='DARK'
+            mode='BADGE'
+            zIndex={300}
+            badgeColors={'black'}
+            badgeTextStyle={{color: 'white'}}
+            selectedItemLabelStyle={{color: '#C1F6A2'}}
+            textStyle={{fontSize: 17, textAlign: 'center', color: 'white'}}
+            placeholderStyle={{fontWeight: '400', fontSize: 18}}
+            style={styles.quizCategory}
+          />
+          <DropDownPicker
+            items={itemData[1]}
+            value={currentValue2}
+            setValue={(val) => handleValueChange(val, setCurrentValue2)}
+            open={isOpen2}
+            setOpen={() => setOpen2(!isOpen2)}
+            onOpen={handleDropdown2Open}
+            placeholder='Funkcijos: J - R'
             dropDownDirection="BOTTOM"
             multiple={true}
             min={0}
@@ -143,18 +210,17 @@ function QuizScreen({ navigation }) {
             badgeTextStyle={{color: 'white'}}
             selectedItemLabelStyle={{color: '#C1F6A2'}}
             textStyle={{fontSize: 17, textAlign: 'center', color: 'white'}}
-            placeholderStyle={{fontWeight: 'bold'}}
+            placeholderStyle={{fontWeight: '400', fontSize: 18}}
             style={styles.quizCategory}
           />
-          <Text style={[styles.quizCategoryTitle, {color: '#F5F4CD'}]}>Kategorija: Antra</Text>
           <DropDownPicker
-            items={itemData[1]}
-            value={currentValue2}
-            setValue={(val) => handleValueChange(val, setCurrentValue2)}
-            open={isOpen2}
-            setOpen={() => setOpen2(!isOpen2)}
-            onOpen={handleDropdown2Open}
-            placeholder='Kategorija: Antra'
+            items={itemData[2]}
+            value={currentValue3}
+            setValue={(val) => handleValueChange(val, setCurrentValue3)}
+            open={isOpen3}
+            setOpen={() => setOpen3(!isOpen3)}
+            onOpen={handleDropdown3Open}
+            placeholder='Funkcijos: S - Ž'
             dropDownDirection="BOTTOM"
             multiple={true}
             min={0}
@@ -168,7 +234,7 @@ function QuizScreen({ navigation }) {
             badgeTextStyle={{color: 'white'}}
             selectedItemLabelStyle={{color: '#C1F6A2'}}
             textStyle={{fontSize: 17, textAlign: 'center', color: 'white'}}
-            placeholderStyle={{fontWeight: 'bold'}}
+            placeholderStyle={{fontWeight: '400', fontSize: 18}}
             style={styles.quizCategory}
           />
           <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
@@ -183,7 +249,7 @@ function QuizScreen({ navigation }) {
           </Modal>
         </View>
         <View style={styles.buttonNext}>
-          <Button title='Tęsti' color='#6699FF' onPress={() => navigation.navigate('Sąrašas', {category1: currentValue1, category2: currentValue2})}/>
+          <Button title='Tęsti' color='#6699FF' onPress={() => navigation.navigate('Produktų Sąrašas', {category1: currentValue1, category2: currentValue2, category3: currentValue3})}/>
         </View>
         <StatusBar style="auto"/>
       </View>
@@ -192,32 +258,28 @@ function QuizScreen({ navigation }) {
 }
  
 function ItemListScreen({route, navigation}) {
-  const {category1, category2} = route.params;
-  const myJSON1 = JSON.stringify(category1);
-  const getValue1 = JSON.parse(myJSON1);
-  const myJSON2 = JSON.stringify(category2);  
-  const getValue2 = JSON.parse(myJSON2);
-  let index = 0;
+  const {category1, category2, category3} = route.params;
+  const categories = [category1, category2, category3];
   const results = [];
+  let index = 0;
  
-  getValue1.forEach((category) => {
-    index = index+1;
-    results.push(
-      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Produktas', {itemId: category})}>
-        <Text style={styles.product}>{index}. Produktas</Text>
-        <Text style={styles.productAfter}>Kategorija: {category}</Text>
-      </TouchableOpacity>
-    )
-  })
-  getValue2.forEach((category) => {
-    index = index+1;
-    results.push(
-      <TouchableOpacity key={index} activeOpacity={0.6} style={styles.listItem} onPress={() => navigation.navigate('Produktas', {itemId: category})}>
-        <Text style={styles.product}>{index}. Produktas</Text>
-        <Text style={styles.productAfter}>Kategorija: {category}</Text>
-      </TouchableOpacity>
-    )
-  })
+  categories.forEach((category, i) => {
+    category.forEach((item, j) => {
+      const key = `${i}-${j}-${item}`;
+      index++;
+      results.push(
+        <TouchableOpacity
+          key={key}
+          activeOpacity={0.6}
+          style={styles.itemListProduct}
+          onPress={() => navigation.navigate('Produktas', { itemId: item })}
+        >
+          <Text style={styles.productFirstLine}>{index}. Produktas</Text>
+          <Text style={styles.productSecondLine}>Kategorijos ID: {item}</Text>
+        </TouchableOpacity>
+      );
+    });
+  });
  
   return (
     <ImageBackground source={require('./assets/background.jpeg')} style={styles.background}>
@@ -227,9 +289,8 @@ function ItemListScreen({route, navigation}) {
             <Text style={styles.helpButtonText}>?</Text>
           </Pressable>
         </View>
-        <View style={styles.listFlex}>
-          <Text style={styles.listTitle}>Produktai:</Text>
-          <Text style={styles.listCategories}>Kategorijos: {getValue1}, {getValue2}</Text>
+        <View style={styles.itemListFlex}>
+          <Text style={styles.itemListTitle}>Produktai:</Text>
           {results}
         </View>        
         <StatusBar style="auto" />
@@ -886,7 +947,7 @@ function App() {
       }}>
         <Stack.Screen name="Sveiki" component={HomeScreen}/>
         <Stack.Screen name="Klausimynas" component={QuizScreen}/>
-        <Stack.Screen name="Sąrašas" component={ItemListScreen}/>
+        <Stack.Screen name="Produktų Sąrašas" component={ItemListScreen}/>
         <Stack.Screen name="Produktas" component={ProductInfoScreen}/>
         <Stack.Screen name="Pagalba" component={HelpScreen}/>
         <Stack.Screen name="Atsiliepimai" component={FeedbackScreen}/>
@@ -947,11 +1008,6 @@ function NavigationBar() {
 export default App;
  
 const styles = StyleSheet.create({
-  modalImage: {
-    width: 320,
-    height: 320,
-    marginTop: 15,
-  },
   registerOrLoginButton: {
     backgroundColor: 'rgb(51, 153, 255)',
     marginTop: 10,
@@ -1018,7 +1074,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     justifyContent: 'center',
   },
-  titleBlock: {
+  mainTitleBlock: {
     top: 50,
     alignItems: 'center',
   },
@@ -1027,27 +1083,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  text1: {
-    fontSize: 20,
+  mainText: {
+    fontSize: 22,
     textAlign: 'center',
-    marginBottom: 280,
+    marginBottom: 270,
     color: 'white',
   },
-  item: {
-    padding: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  textItem: {
-    flex: 1,
-    fontSize: 16,
-    color: 'black',
-  },
   placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
     fontSize: 16,
   },
   helpButton: {
@@ -1088,14 +1130,39 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 15
   },
-  quizCategoryTitle: {
-    fontSize: 19,
-    fontWeight: '500',
-    marginLeft: 15,
-    marginBottom: 7
-  },
   quizCategory: {
-    marginBottom: 15,
+    marginBottom: 12,
+  },
+  itemListProduct: {
+    width: '100%',
+    marginVertical: 5,
+    borderColor: '#313143',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 10,
+    padding: 8,
+    backgroundColor: '#313143',
+  },
+  itemListFlex: {
+    flex: 1,
+    width: '100%',
+    position: 'absolute',
+    alignItems: 'center',
+    marginTop: 50
+  },
+  itemListTitle: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  productFirstLine: {
+    fontSize: 22,
+    color: '#E0E5F7',
+  },
+  productSecondLine: {
+    fontSize: 15,
+    color: '#CFD4E5',
+    marginLeft: 24
   },
   listFlex: {
     flex: 1,
@@ -1108,28 +1175,6 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     color: 'white',
-  },
-  listCategories: {
-    color: 'white'
-  },
-  listItem: {
-    width: '100%',
-    marginVertical: 5,
-    borderColor: '#313143',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderRadius: 10,
-    padding: 8,
-    backgroundColor: '#313143',
-  },
-  product: {
-    fontSize: 22,
-    color: '#E0E5F7',
-  },
-  productAfter: {
-    fontSize: 15,
-    color: '#CFD4E5',
-    marginLeft: 24
   },
   helpTitle: {
     fontSize: 35,
